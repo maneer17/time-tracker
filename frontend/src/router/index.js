@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import TodayEntries from '../components/TodayEntries.vue'
-import DateEntries from '../components/DateEntries.vue'
-import AddForm from '../components/AddForm.vue'
-import HistorySidebar from '../components/HistorySidebar.vue'
-import Login from '../components/Login.vue'
+import TodayEntries from '../views/TodayEntries.vue'
+import DateEntries from '../views/DateEntries.vue'
+import AddForm from '../views/AddForm.vue'
+import HistorySidebar from '../views/HistorySidebar.vue'
+import Login from '../views/Login.vue'
+import SignUp from '@/views/SignUp.vue'
+import { compile } from 'vue'
 
 const routes = [
   {
@@ -29,6 +31,11 @@ const routes = [
     path: '/login',
     name: 'login',
     component: Login
+  },
+  {
+    path: '/signup',
+    name: 'signup',
+    component: SignUp
   }
 ]
 
@@ -44,7 +51,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !token) {
     next('/login')
   } else if (to.name === 'login' && token) {
-    next('/') // Redirect to home if already logged in
+    next('/') 
   } else {
     next()
   }
