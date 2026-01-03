@@ -1,189 +1,134 @@
 <template>
-  <div class="login-form">
-    <h2>Login</h2>
-
-    <form @submit.prevent="handleSubmit">
-      <div class="form-group">
-        <label>Email:</label>
-        <input type="email" v-model="formData.email" required />
+  <div class="bg-gray-50 min-h-screen pt-12">
+    <div class="max-w-md mx-auto bg-white rounded shadow-sm p-6 text-gray-900">
+      
+      <h2 class="text-xl font-bold mb-4">Create Account</h2>
+      <div v-if="success" class="success">
+        {{ success }}
       </div>
-      <div class="form-group">
-        <label>Name:</label>
-        <input type="text" v-model="formData.name" required />
-      </div>      
+      <form
+        v-else
+        class="flex flex-col space-y-4"
+        @submit.prevent="submit"
+        novalidate
+      >
+        <div class="flex flex-col space-y-1">
+          <label>Name</label>
+          <input type="text" v-model="form.name" />
+          <span v-if="errors.name" class="error">{{ errors.name[0] }}</span>
+        </div>
 
-      <div class="form-group">
-        <label>Password:</label>
-        <input type="password" v-model="formData.password" required />
-      </div>
+        <div class="flex flex-col space-y-1">
+          <label>Email</label>
+          <input type="email" v-model="form.email" />
+          <span v-if="errors.email" class="error">{{ errors.email[0] }}</span>
+        </div>
 
-      <div class="form-group">
-        <label>Password Confirmation:</label>
-        <input type="password" v-model="formData.password_confirmation" required />
-      </div>
-      <button type="submit" :disabled="loading">
-        {{ loading ? 'Registering...' : 'Sign up' }}
-      </button>
+        <div class="flex flex-col space-y-1">
+          <label>Password</label>
+          <input type="password" v-model="form.password" />
+          <span v-if="errors.password" class="error">{{ errors.password[0] }}</span>
+        </div>
 
-      <div v-if="error" class="error">{{ error }}</div>
-      <div v-if="success" class="success">{{ success }}</div>
-    </form>
+        <div class="flex flex-col space-y-1">
+          <label>Password Confirmation</label>
+          <input type="password" v-model="form.password_confirmation" />
+          <span v-if="errors.password_confirmation" class="error">
+            {{ errors.password_confirmation[0] }}
+          </span>
+        </div>
+
+        <button :disabled="loading" class="btn">
+          {{ loading ? 'Creating account...' : 'Sign Up' }}
+        </button>
+      </form>
+
+    </div>
   </div>
 </template>
 
-<script>
-import { ref } from 'vue'
+<script setup>
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
-export default {
-  name: 'Login',
+const router = useRouter()
 
-  setup() {
-    const router = useRouter()
+const loading = ref(false)
+const success = ref('')
+const errors = ref({})
 
-    const formData = ref({
-      email: '',
-      name: '',
-      password: '',
-      password_confirmation: ''
-    
-    })
+const form = reactive({
+  name: '',
+  email: '',
+  password: '',
+  password_confirmation: ''
+})
 
-    const loading = ref(false)
-    const error = ref(null)
-    const success = ref(null)
+const submit = async () => {
+  loading.value = true
+  errors.value = {}
+  success.value = ''
 
-    const handleSubmit = async () => {
-      loading.value = true
-      error.value = null
-      success.value = null
+  try {
+    const response = await axios.post(
+      'http://localhost:8000/api/store',
+      form
+    )
 
-      try {
-        const response = await axios.post(
-          'http://localhost:8000/api/store',
-          formData.value
-        )
+    success.value = response.data.message
 
-        const token = response.data.token
+    const token = response.data.token
+    localStorage.setItem('authToken', token)
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
-        localStorage.setItem('authToken', token)
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    setTimeout(() => {
+      router.push('/')
+    }, 600)
 
-        success.value = 'Registered  successfully!'
-
-        setTimeout(() => {
-          router.push('/')
-        })
-      } catch (err) {
-        if (err.response?.status === 422) {
-          const errorData = err.response.data
-
-          if (errorData.errors) {
-            const firstError = Object.values(errorData.errors)[0][0]
-            error.value = firstError
-          } else if (errorData.message) {
-            error.value = errorData.message
-          } else {
-            error.value = 'Invalid credentials'
-          }
-        } else if (err.response?.status === 401) {
-          error.value = 'Invalid email or password'
-        } else {
-          error.value = 'Login failed. Please try again.'
-        }
-
-        console.error('Login error:', err.response?.data || err.message)
-      } finally {
-        loading.value = false
-      }
+  } catch (error) {
+    if (error.response?.status === 422) {
+      errors.value = error.response.data.errors
+    } else {
+      console.error(error)
     }
-
-    return {
-      formData,
-      loading,
-      error,
-      success,
-      handleSubmit
-    }
+  } finally {
+    loading.value = false
   }
 }
 </script>
 
 <style scoped>
-.login-form {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 20px;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  background: white;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #333;
-}
-
-.form-group input {
-  width: 100%;
+input {
   padding: 10px;
   border: 1px solid #ced4da;
   border-radius: 5px;
-  font-size: 16px;
 }
 
-.form-group input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-
-button {
-  width: 100%;
+.btn {
   padding: 12px;
   background: #007bff;
   color: white;
-  border: none;
   border-radius: 5px;
-  font-size: 16px;
   font-weight: 600;
+  border: none;
   cursor: pointer;
-  transition: background 0.3s;
 }
 
-button:hover:not(:disabled) {
-  background: #0056b3;
-}
-
-button:disabled {
+.btn:disabled {
   background: #ccc;
-  cursor: not-allowed;
 }
 
 .error {
-  margin-top: 15px;
-  padding: 12px;
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-  border-radius: 5px;
+  color: #dc3545;
   font-size: 14px;
 }
 
 .success {
-  margin-top: 15px;
-  padding: 12px;
   background: #d4edda;
   color: #155724;
-  border: 1px solid #c3e6cb;
+  padding: 12px;
   border-radius: 5px;
-  font-size: 14px;
+  margin-bottom: 10px;
 }
 </style>

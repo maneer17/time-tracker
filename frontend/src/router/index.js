@@ -43,8 +43,6 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
-
-// Navigation guard to protect routes
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('authToken')
   

@@ -31,8 +31,6 @@ const router = useRouter()
 const loading = ref(false)
 const success = ref(null)
 const error = ref(null)
-
-// Check if user is logged in
 const isLoggedIn = computed(() => {
   return !!localStorage.getItem('authToken')
 })
@@ -65,8 +63,6 @@ const handleLogout = async () => {
     loading.value = false
   }
 }
-
-// Optional: Redirect to login if not authenticated
 onMounted(() => {
   if (!isLoggedIn.value && !['/login', '/register'].includes(router.currentRoute.value.path)) {
     router.push('/login')
