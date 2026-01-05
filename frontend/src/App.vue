@@ -1,6 +1,5 @@
 <template>
   <div class="app">
-    <!-- Only show sidebar if user is logged in -->
     <div v-if="isLoggedIn" class="sidebar">
       <h2>History</h2>
       <HistorySidebar />
@@ -58,13 +57,12 @@ const handleLogout = async () => {
 
   } catch (err) {
     error.value = 'Logout failed. Please try again.'
-    console.error(err.response?.data || err.message)
   } finally {
     loading.value = false
   }
 }
 onMounted(() => {
-  if (!isLoggedIn.value && !['/login', '/register'].includes(router.currentRoute.value.path)) {
+  if (!isLoggedIn.value) {
     router.push('/login')
   }
 })
