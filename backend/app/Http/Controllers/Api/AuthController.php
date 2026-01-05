@@ -10,18 +10,25 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function store(Request $request){
-        $validated = $request->validate([
-            "name" =>"required",
-            "email"=>"required|email",
-            "password"=>"required"
-        ]);
-        $user = User::create($validated);
-         $token = $user->createToken('api-token')->plainTextToken;
-        return response()->json([
-            'token'=> $token
-        ]);
-    }
+    public function store(Request $request)
+{
+    $validated = $request->validate([
+        "name" => "required",
+        "email" => "required|email|unique:users",
+        "password" => "required|min:6"
+    ]);
+
+    $validated['password'] = Hash::make($validated['password']);
+
+    $user = User::create($validated);
+
+    $token = $user->createToken('api-token')->plainTextToken;
+
+    return response()->json([
+        'token' => $token,
+        'user' => $user
+    ]);
+}
     public function login(Request $request){
         $request->validate([
             "email"=>"required|email",
@@ -42,7 +49,8 @@ class AuthController extends Controller
         }
         $token = $user->createToken('api-token')->plainTextToken;
         return response()->json([
-            'token'=> $token
+            'token'=> $token,
+            'user' => $user
         ]);
     }
 
