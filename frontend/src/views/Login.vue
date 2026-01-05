@@ -32,6 +32,7 @@
       </form>
 
     </div>
+    <p>don't have an account create one <router-link to="/signup" class="add-btn">here</router-link></p>
   </div>
 </template>
 

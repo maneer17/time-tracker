@@ -5,7 +5,7 @@ import AddForm from '../views/AddForm.vue'
 import HistorySidebar from '../views/HistorySidebar.vue'
 import Login from '../views/Login.vue'
 import SignUp from '@/views/SignUp.vue'
-import { compile } from 'vue'
+
 
 const routes = [
   {
