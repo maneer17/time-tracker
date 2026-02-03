@@ -20,7 +20,6 @@ class TimeEntryFactory extends Factory
             "label" => fake()->name,
             "start_time" => fake()->time(),
             "end_time" => fake()->time(),
-            "user_id" => 2,
             "created_at" => today()
             //
         ];

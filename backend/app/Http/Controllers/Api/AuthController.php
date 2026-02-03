@@ -6,19 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\StoreUserRequest; 
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
 {
-    $validated = $request->validate([
-        "name" => "required",
-        "email" => "required|email|unique:users",
-        "password" => "required|min:6"
-    ]);
-
-    $validated['password'] = Hash::make($validated['password']);
+    $validated = $request->validated();
 
     $user = User::create($validated);
 
@@ -56,6 +51,6 @@ class AuthController extends Controller
 
     public function logout(Request $request){
         $request->user()->tokens()->delete();
-        return response()->json(["message"=>"logged out successfully"]);
+        return response()->json(["message"=>"logged out successfully"+"$user->name"]);
     }
 }
