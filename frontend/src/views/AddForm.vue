@@ -33,24 +33,24 @@ const handleSubmit = async ()=> {
 <template>
   <form @submit.prevent="handleSubmit">
     <div class="field">
-      <label>Label</label>
+      <label>{{ $t("addForm.label") }}</label>
       <input type="text" v-model="label" required>
       <span v-if="errors?.label" class="err">{{ errors.label[0] }}</span>
     </div>
 
     <div class="field">
-      <label>Start Time</label>
+      <label>{{ $t("addForm.start_time") }}</label>
       <input type="time" v-model="startTime" required>
       <span v-if="errors?.start_time" class="err">{{ errors.start_time[0] }}</span>
     </div>
 
     <div class="field">
-      <label>End Time</label>
+      <label>{{ $t("addForm.end_time") }}</label>
       <input type="time" v-model="endTime" required>
       <span v-if="errors?.end_time" class="err">{{ errors.end_time[0] }}</span>
     </div>
 
-    <button type="submit" class="submit">Add Entry</button>
+    <button type="submit" class="submit">{{ $t("addForm.add_entry") }}</button>
     <p v-if="response" class="success">{{ response.data }}</p>
   </form>
 </template>

@@ -2,16 +2,19 @@
 import useFetch from '@/composables/fetch'
 import fetchDates from '@/composables/history'
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ListView from '@/components/ListView.vue'
 import History from './History.vue'
 import AddForm from './AddForm.vue'
 
+const { t } = useI18n()
+
 const url = ref('/api/time-entries')
-const title = ref('Time Entries for Today')
+const title = ref(`${t('home.today_entries')} `)
 const showHistory = ref(false)
 const showForm = ref(false)
 
-const historyButtonText = computed(() => showHistory.value ? '← Hide' : 'History →')
+const historyButtonText = computed(() => showHistory.value ? `← ${t('home.hide')}` : `${t('home.history')} →`)
 
 const { data: entries, error } = useFetch(url)
 
@@ -23,12 +26,12 @@ const toggleHistory = () => {
 
 const goToDate = (date) => {
   url.value = `/api/time-entries/by-date/${date}`
-  title.value = `Time Entries of ${date}`
+  title.value = `${t('home.entries_of')} ${date}`
 }
 
 const todayEntries = ()=>{
     url.value = '/api/time-entries'
-    title.value = 'Time Entries of Today'
+    title.value = t('home.today_entries')
 }
 
 const renderForm=()=>{
@@ -41,9 +44,9 @@ const renderForm=()=>{
     <div class="main">
       <div class="actions">
         <button @click="renderForm" v-if="url=='/api/time-entries'" class="btn primary">
-          Add New Entry
+          {{ $t('home.add_new_entry') }}
         </button>
-        <button @click="todayEntries" class="btn">Today's Entries</button>
+        <button @click="todayEntries" class="btn">{{ $t('home.today_entries') }}</button>
         <button @click="toggleHistory" class="btn toggle">
           {{ historyButtonText }}
         </button>
@@ -53,18 +56,18 @@ const renderForm=()=>{
         <AddForm @data-submitted="renderForm"/>
       </div>
 
-      <div v-if="error" class="error">Oops! Error encountered: {{ error }}</div>
+      <div v-if="error" class="error">{{ $t('home.error') }}: {{ error }}</div>
       <div v-else-if="entries">
         <h1>{{ title }}</h1>
         <ListView :entries="entries" />
       </div>
-      <div v-else class="loading">Loading entries...</div>
+      <div v-else class="loading">{{ $t('home.loading') }}</div>
     </div>
 
     <div class="sidebar" :class="{ open: showHistory }">
-      <h3>History</h3>
-      <div v-if="datesError" class="error">Error loading dates: {{ datesError }}</div>
-      <div v-else-if="!dates || dates.length === 0" class="empty">No dates available</div>
+      <h3>{{ $t('home.history') }}</h3>
+      <div v-if="datesError" class="error">{{ $t('home.error_loading_dates') }}: {{ datesError }}</div>
+      <div v-else-if="!dates || dates.length === 0" class="empty">{{ $t('home.no_dates') }}</div>
       <History v-else :dates="dates" @click-date="goToDate" />
     </div>
   </div>

@@ -7,7 +7,11 @@ const props = defineProps(['entry'])
   <div class="entry">
     <span class="label">{{ entry.label }}</span>
     <span class="time">{{ entry.start_time }} - {{ entry.end_time }}</span>
-    <span class="duration">{{ entry.time_taken }}</span>
+<span class="duration">
+  {{ $t('single_entry.hour', entry.time_taken.hours) }} 
+  ,
+  {{ $t('single_entry.minute', entry.time_taken.minutes) }}
+</span>
   </div>
 </template>
 

@@ -2,13 +2,13 @@
   <nav class="nav">
     <ol class="list">
       <li class="item">
-        <router-link :to="{ name: 'Home' }">Home</router-link>
+        <router-link :to="{ name: 'Home' }">{{ $t("nav.home") }}</router-link>
       </li>
       <li class="item">
-        <router-link :to="{ name: 'About' }">About</router-link>
+        <router-link :to="{ name: 'About' }">{{ $t("nav.about") }}</router-link>
       </li>
       <li class="item">
-        <button @click="handleLogout">Sign Out</button>
+        <button @click="handleLogout">{{ $t("nav.sign_out") }}</button>
       </li>
     </ol>
   </nav>

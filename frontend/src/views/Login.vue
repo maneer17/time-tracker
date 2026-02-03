@@ -4,19 +4,15 @@ import { useAuthStore } from '@/stores/auth';
 import router from '@/router'
 
 const email = ref('');
-const name = ref('')
 const password = ref('')
-const password_confirmation = ref('')
 const errors = ref(null)
 const authStore = useAuthStore();
 
 const handleSubmit = async ()=>{
     errors.value = null
-    const result = await authStore.register({
-    name: name.value,   
+    const result = await authStore.login({
     email: email.value,
-    password: password.value,
-    password_confirmation: password_confirmation.value
+    password: password.value
   })
 
     if(!result.success && result.errors){
@@ -28,18 +24,14 @@ const handleSubmit = async ()=>{
 <template>
   <div class="page">
     <form @submit.prevent="handleSubmit">
-      <h2>Create Account</h2>
+      <h2>{{ $t("login.welcome_back") }}</h2>
       
-      <div class="field">
-        <label>Name</label>
-        <input type="text" v-model="name" required>
-        <span v-if="errors?.errors?.name" class="error">
-          {{ errors.errors.name[0] }}
-        </span>
+      <div v-if="errors?.message" class="alert">
+        {{ errors.message }}
       </div>
 
       <div class="field">
-        <label>Email</label>
+        <label>{{ $t('login.email') }}</label>
         <input type="email" v-model="email" required>
         <span v-if="errors?.errors?.email" class="error">
           {{ errors.errors.email[0] }}
@@ -47,25 +39,18 @@ const handleSubmit = async ()=>{
       </div>
 
       <div class="field">
-        <label>Password</label>
+        <label>{{ $t('login.password') }}</label>
         <input type="password" v-model="password" required>
-        <span v-if="errors?.errors?.password" class="error">
-          {{ errors.errors.password[0] }}
-        </span>
       </div>
 
-      <div class="field">
-        <label>Confirm Password</label>
-        <input type="password" v-model="password_confirmation" required>
-      </div>
-
-      <button type="submit" class="btn">Sign Up</button>
+      <button type="submit" class="btn">{{ $t('login.login') }}</button>
+      
+      <p class="signup">
+        {{ $t('login.dont_have_account') }}
+        <router-link :to="{name: 'Register'}">{{$t('login.sign_up_here')}}</router-link>
+      </p>
     </form>
   </div>
-    <p class="login">
-        You already have an account? 
-        <router-link :to="{name: 'Login'}">Login</router-link>
-    </p>
 </template>
 
 <style scoped>
@@ -93,6 +78,16 @@ h2 {
   font-size: 1.8rem;
   font-weight: 600;
   text-align: center;
+}
+
+.alert {
+  padding: 0.8rem;
+  margin-bottom: 1.5rem;
+  background: #fee;
+  color: #c33;
+  border-radius: 6px;
+  border: 1px solid #fcc;
+  font-size: 0.9rem;
 }
 
 .field {
@@ -156,20 +151,21 @@ input:focus {
 .btn:active {
   transform: translateY(1px);
 }
-.login {
+
+.signup {
   margin-top: 1.5rem;
   text-align: center;
   color: #666;
   font-size: 0.9rem;
 }
 
-.login a {
+.signup a {
   color: #007bff;
   text-decoration: none;
   font-weight: 500;
 }
 
-.login a:hover {
+.signup a:hover {
   text-decoration: underline;
 }
 </style>
