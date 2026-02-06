@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::middleware('guest')->controller(AuthController::class)->group(function () {
-    Route::post('/register', 'store');  // Changed from /store to /register
+    Route::post('/register', 'store');  
     Route::post('/login', 'login');
 });
 

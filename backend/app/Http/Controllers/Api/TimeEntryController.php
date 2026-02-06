@@ -13,13 +13,13 @@ class TimeEntryController extends Controller
 {
     public function index()
     { 
-        $time_entries = auth()->user()->time_entries()->whereDate('created_at', today())->get(); 
+        $time_entries = auth()->user()->time_entries()->whereDate('created_at', today())->latest()->get(); 
         return TimeEntryResource::collection($time_entries);
     }
     
     public function byDate(string $date)
     {
-        $time_entries = auth()->user()->time_entries()->date($date)->get();
+        $time_entries = auth()->user()->time_entries()->date($date)->latest()->get();
         return TimeEntryResource::collection($time_entries);
     }
 

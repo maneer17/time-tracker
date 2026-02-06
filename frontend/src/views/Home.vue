@@ -1,7 +1,7 @@
 <script setup>
 import useFetch from '@/composables/fetch'
 import fetchDates from '@/composables/history'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ListView from '@/components/ListView.vue'
 import History from './History.vue'
@@ -15,10 +15,10 @@ const showHistory = ref(false)
 const showForm = ref(false)
 
 const historyButtonText = computed(() => showHistory.value ? `← ${t('home.hide')}` : `${t('home.history')} →`)
-
 const { data: entries, error } = useFetch(url)
-
 const { dates, err: datesError } = fetchDates('/api/time-entries/history')
+
+
 
 const toggleHistory = () => {
   showHistory.value = !showHistory.value
@@ -59,7 +59,9 @@ const renderForm=()=>{
       <div v-if="error" class="error">{{ $t('home.error') }}: {{ error }}</div>
       <div v-else-if="entries">
         <h1>{{ title }}</h1>
-        <ListView :entries="entries" />
+        <div class="content-wrapper">
+          <ListView :entries="entries" />
+        </div>
       </div>
       <div v-else class="loading">{{ $t('home.loading') }}</div>
     </div>
@@ -160,6 +162,12 @@ h1 {
   color: #333;
   font-size: 1.8rem;
   font-weight: 600;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
 }
 
 .sidebar {
