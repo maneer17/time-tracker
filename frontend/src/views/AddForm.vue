@@ -13,6 +13,7 @@ const errors = ref(null)
 
 const handleSubmit = async ()=> {
     errors.value = null
+    console.log(startTime.value)
     const result =await Store('/api/time-entries',{
         label: label.value,
         start_time: startTime.value,

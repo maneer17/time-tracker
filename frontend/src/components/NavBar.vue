@@ -8,6 +8,9 @@
         <router-link :to="{ name: 'About' }">{{ $t("nav.about") }}</router-link>
       </li>
       <li class="item">
+        <router-link :to="{ name: 'Live' }">Live</router-link>
+      </li>      
+      <li class="item">
         <button @click="handleLogout">{{ $t("nav.sign_out") }}</button>
       </li>
     </ol>

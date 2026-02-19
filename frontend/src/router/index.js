@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
+import LiveTask from '@/views/LiveTask.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +31,11 @@ const router = createRouter({
       name: "Register",
       component: Register
     },
+    {
+      path: "/live",
+      name: "Live",
+      component: LiveTask
+    }
   ],
 })
 
