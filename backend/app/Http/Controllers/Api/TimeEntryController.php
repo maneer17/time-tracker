@@ -12,7 +12,7 @@ class TimeEntryController extends Controller
 {
     public function index(Request $request)
     {
-        $filters = $request->only(['date', 'sort', 'history']);
+        $filters = $request->only(['date', 'sort', 'search', 'history']);
         if ($request->boolean('history')) {
             $dates = auth()->user()
                 ->time_entries()

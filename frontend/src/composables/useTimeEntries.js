@@ -41,5 +41,25 @@ export function Store(url, formData) {
       }
     })
 }
+export function deleteEntry(url){
+  return apiClient.delete(url)
+    .then(response => ({
+      success: true,
+      data: response.data
+    }
+  ))
+    .catch(error => {
+      if (error.response?.status === 422 && error.response?.data?.errors) {
+        return {
+          success: false,
+          errors: error.response.data.errors
+        }
+      }
+      return {
+        success: false,
+        errors: error.response?.data || { message: 'Network error' }
+      }
+    })
 
-export default { Store, useFetch } 
+}
+export default { Store, useFetch, deleteEntry } 

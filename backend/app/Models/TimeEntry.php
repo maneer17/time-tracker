@@ -55,6 +55,9 @@ public function scopeToday(Builder $query): Builder
         today()  
     );
 }
+public function scopeSearchByLabel(Builder $query, string $search): Builder {
+    return $query->where('label', 'LIKE', '%' . $search . '%');
+}
 
 public function scopeSort(Builder $query, string $sort): Builder
 {
@@ -82,7 +85,10 @@ public function scopeSearch($query, array $filters): Builder
     )
     ->when($filters['sort'] ?? null, 
         fn($q, $sort) => $q->sort($sort)
-    );
+    )
+    ->when($filters['search']?? null,
+    fn($q,$search)=> $q->searchByLabel($search))
+    ;
     
     return $query;  
 }}

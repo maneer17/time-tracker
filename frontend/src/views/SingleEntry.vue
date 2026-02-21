@@ -1,4 +1,8 @@
 <script setup>
+import { deleteEntry } from '@/composables/useTimeEntries';
+const removeEntry = (entry)=> {
+  deleteEntry(`/api/time-entries/${entry.id}`)
+}
 const props = defineProps(['entry'])
 </script>
 
@@ -11,5 +15,6 @@ const props = defineProps(['entry'])
       ,
       {{ $t('single_entry.minute', entry.time_taken.minutes) }}
     </span>
+    <button @click ="removeEntry(entry)">remove entry</button>
   </div>
 </template>
