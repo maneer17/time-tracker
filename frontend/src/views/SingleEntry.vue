@@ -1,6 +1,3 @@
-Also removing the unused `onMounted` import:
-
-```vue
 <script setup>
 const props = defineProps(['entry'])
 </script>
