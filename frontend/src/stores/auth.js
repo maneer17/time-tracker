@@ -1,14 +1,6 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
-import router from '@/router' // IMPORT ROUTER
+import router from '@/router' 
 import apiClient from '@/services/api';
-const instance = axios.create({
-  baseURL: 'http://localhost:8000',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-});
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
@@ -76,19 +68,35 @@ export const useAuthStore = defineStore('authStore', {
     },
     
    async logout() {
-      this.user = null;
-      this.token = null;
-      this.isAuthenticated = false;
-      localStorage.removeItem('token');
-      router.push('/login');
+     try {
+        await apiClient.post('/api/logout');
+        this.user = null;
+        this.token = null;
+        this.isAuthenticated = false;
+        localStorage.removeItem('token');
+        router.push('/login');
+        return { success: true };
+        
+      } catch (error) {
+        if (error.response) {
+          console.log(error.response)
+          return { 
+            success: false, 
+            errors: error.response.data 
+          };
+        } else {
+          return { 
+            success: false, 
+            errors: { message: 'Network error. Please try again.' } 
+          };
+        }
+      }
     },
     
     async checkAuth() {
       if (this.token) {
         try {
-          const response = await apiClient.get('/api/user', {
-            headers: { Authorization: `Bearer ${this.token}` }
-          });
+          const response = await apiClient.get('/api/user');
           this.user = response.data;
           this.isAuthenticated = true;
         } catch (error) {

@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
-
+import './assets/main.css'
 const app = createApp(App)
 
 app.use(createPinia())
@@ -39,6 +39,7 @@ legacy: false,
       nav: {
         home: "Home",
         about: "About",
+        add: "Add a new Time Entry",
         sign_out: "Sign Out",
 
       },
@@ -92,6 +93,7 @@ legacy: false,
       nav: {
         home: "الصفحة الرئيسية",
         about: "عن الموقع",
+        add: 'أضف نشاط جديد',
         sign_out: "تسجيل الخروج",
         
       },

@@ -1,17 +1,29 @@
 <template>
-  <nav class="nav">
-    <ol class="list">
-      <li class="item">
-        <router-link :to="{ name: 'Home' }">{{ $t("nav.home") }}</router-link>
+  <nav class="fixed top-0 left-0 right-0 bg-[#333] px-8 py-4 z-[1000] shadow-md">
+    <ol class="flex gap-2 list-none m-0 p-0">
+      <li>
+        <router-link 
+          :to="{ name: 'Home' }"
+          class="block text-white no-underline px-4 py-2 rounded bg-transparent text-[0.95rem] transition-colors duration-200 hover:bg-[#555] [&.router-link-active]:bg-[#007bff]"
+        >{{ $t("nav.home") }}</router-link>
       </li>
-      <li class="item">
-        <router-link :to="{ name: 'About' }">{{ $t("nav.about") }}</router-link>
-      </li>
-      <li class="item">
-        <router-link :to="{ name: 'Live' }">Live</router-link>
+      <li>
+        <router-link 
+          :to="{ name: 'Add' }"
+          class="block text-white no-underline px-4 py-2 rounded bg-transparent text-[0.95rem] transition-colors duration-200 hover:bg-[#555] [&.router-link-active]:bg-[#007bff]"
+        >{{ $t("nav.add") }}</router-link>
       </li>      
-      <li class="item">
-        <button @click="handleLogout">{{ $t("nav.sign_out") }}</button>
+      <li>
+        <router-link 
+          :to="{ name: 'About' }"
+          class="block text-white no-underline px-4 py-2 rounded bg-transparent text-[0.95rem] transition-colors duration-200 hover:bg-[#555] [&.router-link-active]:bg-[#007bff]"
+        >{{ $t("nav.about") }}</router-link>
+      </li>     
+      <li>
+        <button 
+          @click="handleLogout"
+          class="block text-white px-4 py-2 rounded bg-transparent border-none cursor-pointer text-[0.95rem] transition-colors duration-200 hover:bg-[#555]"
+        >{{ $t("nav.sign_out") }}</button>
       </li>
     </ol>
   </nav>
@@ -22,51 +34,7 @@ import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
 
-const handleLogout = () => {
-  authStore.logout();
+const handleLogout = async () => {
+  await authStore.logout();
 };
 </script>
-
-<style scoped>
-.nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #333;
-  padding: 1rem 2rem;
-  z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.list {
-  display: flex;
-  gap: 0.5rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.item a,
-.item button {
-  display: block;
-  color: white;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: background 0.2s;
-}
-
-.item a:hover,
-.item button:hover {
-  background: #555;
-}
-
-.item a.router-link-active {
-  background: #007bff;
-}
-</style>

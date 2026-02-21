@@ -1,3 +1,4 @@
+```vue
 <script setup>
 import NavBar from './components/NavBar.vue';
 import { useI18n } from 'vue-i18n';
@@ -14,59 +15,28 @@ watch(locale, (newLocale) => {
   document.documentElement.setAttribute('dir', newLocale === 'ar' ? 'rtl' : 'ltr');
 });
 </script>
+
 <template>
-  <div class="locale-changer" :class="{ 'locale-changer-rtl': locale === 'ar' }">
-    <select v-model="$i18n.locale">
+  <div 
+    class="fixed top-2.5 z-[2000] transition-all duration-300"
+    :class="locale === 'ar' ? 'left-2.5' : 'right-2.5'"
+  >
+    <select 
+      v-model="$i18n.locale"
+      class="py-2 px-4 border border-[#ddd] rounded bg-white cursor-pointer text-[0.9rem] shadow-sm hover:border-[#007bff] focus:outline-none focus:border-[#007bff]"
+    >
       <option v-for="locale in $i18n.availableLocales" :key="`locale-${locale}`" :value="locale">
         {{ locale }}
       </option>
     </select>
   </div>
-  
+
   <NavBar v-if="authStore.isAuthenticated" />
-  
-  <div :class="{ content: authStore.isAuthenticated }">
+
+  <div :class="{ 'mt-[60px]': authStore.isAuthenticated }">
     <router-view />
   </div>
 </template>
-<style scoped>
-.locale-changer {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 2000;
-  transition: left 0.3s ease, right 0.3s ease;
-}
+```
 
-.locale-changer-rtl {
-  left: 10px;
-  right: auto;
-}
-
-.locale-changer select {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-  font-size: 0.9rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.locale-changer select:hover {
-  border-color: #007bff;
-}
-.locale-changer select:focus {
-  outline: none;
-  border-color: #007bff;
-}
-.content {
-  margin-top: 60px;
-}
-h1 {
-  padding: 2rem 2rem 0;
-  margin: 0;
-  color: #333;
-  font-size: 2rem;
-  font-weight: 600;
-}
-</style>
+That's all of them! Are you done or do you have more?

@@ -29,9 +29,6 @@ Route::middleware('guest')->controller(AuthController::class)->group(function ()
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    
-    Route::get('time-entries/history', [TimeEntryController::class, "history"]);
-    Route::get('time-entries/by-date/{date}', [TimeEntryController::class, "byDate"]);
     Route::apiResource('time-entries', TimeEntryController::class);
 });
 

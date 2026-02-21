@@ -6,14 +6,14 @@ const props = defineProps(['entries']);
 </script>
 
 <template>
-  <div class="list-container">
-    <div class="list">
+  <div class="flex gap-8 w-full">
+    <div class="flex-1 max-w-[600px]">
       <div v-for="entry in entries" :key="entry.id">
         <SingleEntry :entry="entry"/>
       </div>
     </div>
     
-    <div class="chart-wrapper">
+    <div class="flex-none w-[350px] min-w-0">
       <BarChart :chart-data="{
         labels: entries.map(row => row.label),
         datasets: [{
@@ -25,21 +25,3 @@ const props = defineProps(['entries']);
     </div>
   </div>
 </template>
-
-<style scoped>
-.list-container {
-  display: flex;
-  gap: 2rem;
-  width: 100%;
-}
-
-.list {
-  flex: 1;
-  max-width: 600px;
-}
-
-.chart-wrapper {
-  flex: 0 0 350px;
-  min-width: 0;
-}
-</style>

@@ -1,197 +1,77 @@
 <script setup>
-import useFetch from '@/composables/fetch'
-import fetchDates from '@/composables/history'
-import { ref, computed, onMounted } from 'vue'
+import { useFetch} from '@/composables/useTimeEntries'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import ListView from '@/components/ListView.vue'
 import History from './History.vue'
-import AddForm from './AddForm.vue'
+import ListView from '@/components/ListView.vue'
 
 const { t } = useI18n()
 
 const url = ref('/api/time-entries')
-const title = ref(`${t('home.today_entries')} `)
+const title = ref(`${t('home.today_entries')}`)
 const showHistory = ref(false)
-const showForm = ref(false)
 
-const historyButtonText = computed(() => showHistory.value ? `← ${t('home.hide')}` : `${t('home.history')} →`)
+const historyButtonText = computed(() =>
+  showHistory.value ? `← ${t('home.hide')}` : `${t('home.history')} →`
+)
 const { data: entries, error } = useFetch(url)
-const { dates, err: datesError } = fetchDates('/api/time-entries/history')
-
-
+const { data: dates, error: datesError } = useFetch('/api/time-entries?history=true')
 
 const toggleHistory = () => {
   showHistory.value = !showHistory.value
 }
 
 const goToDate = (date) => {
-  url.value = `/api/time-entries/by-date/${date}`
+  url.value = `/api/time-entries?date=${date}`
   title.value = `${t('home.entries_of')} ${date}`
 }
 
-const todayEntries = ()=>{
-    url.value = '/api/time-entries'
-    title.value = t('home.today_entries')
-}
-
-const renderForm=()=>{
-    showForm.value = !showForm.value
+const todayEntries = () => {
+  url.value = '/api/time-entries'
+  title.value = t('home.today_entries')
 }
 </script>
 
 <template>
-  <div class="container" :class="{ 'sidebar-open': showHistory }">
-    <div class="main">
-      <div class="actions">
-        <button @click="renderForm" v-if="url=='/api/time-entries'" class="btn primary">
-          {{ $t('home.add_new_entry') }}
-        </button>
-        <button @click="todayEntries" class="btn">{{ $t('home.today_entries') }}</button>
-        <button @click="toggleHistory" class="btn toggle">
-          {{ historyButtonText }}
-        </button>
+  <div class="flex min-h-screen relative">
+    <!-- Main -->
+    <div class="flex-1 p-8" :class="{ 'mr-[280px]': showHistory }">
+      <div class="flex gap-2 mb-6 flex-wrap">
+        <button 
+          @click="todayEntries"
+          class="px-5 py-2.5 border border-[#ddd] bg-white rounded cursor-pointer text-[0.9rem] transition-all duration-200 hover:bg-[#f5f5f5] hover:border-[#999]"
+        >{{ $t('home.today_entries') }}</button>
+        <button 
+          @click="toggleHistory"
+          class="ml-auto px-5 py-2.5 border border-[#ddd] bg-white rounded cursor-pointer text-[0.9rem] transition-all duration-200 hover:bg-[#f5f5f5] hover:border-[#999]"
+        >{{ historyButtonText }}</button>
       </div>
 
-      <div v-if="showForm" class="form-wrap">
-        <AddForm @data-submitted="renderForm"/>
+      <div v-if="error" class="p-4 bg-[#ffeeee] text-[#cc3333] rounded border border-[#ffcccc]">
+        {{ $t('home.error') }}: {{ error }}
       </div>
-
-      <div v-if="error" class="error">{{ $t('home.error') }}: {{ error }}</div>
       <div v-else-if="entries">
-        <h1>{{ title }}</h1>
-        <div class="content-wrapper">
+        <h1 class="mt-0 mb-6 text-[#333] text-[1.8rem] font-semibold">{{ title }}</h1>
+        <div class="flex gap-8 items-start">
           <ListView :entries="entries" />
         </div>
       </div>
-      <div v-else class="loading">{{ $t('home.loading') }}</div>
+      <div v-else class="text-center py-8 text-[#666]">{{ $t('home.loading') }}</div>
     </div>
 
-    <div class="sidebar" :class="{ open: showHistory }">
-      <h3>{{ $t('home.history') }}</h3>
-      <div v-if="datesError" class="error">{{ $t('home.error_loading_dates') }}: {{ datesError }}</div>
-      <div v-else-if="!dates || dates.length === 0" class="empty">{{ $t('home.no_dates') }}</div>
+    <!-- Sidebar -->
+    <div 
+      class="fixed right-0 top-[60px] w-[280px] h-[calc(100vh-60px)] bg-white border-l border-[#ddd] p-6 overflow-y-auto shadow-[-2px_0_8px_rgba(0,0,0,0.1)] transition-transform duration-300"
+      :class="showHistory ? 'translate-x-0' : 'translate-x-full'"
+    >
+      <h3 class="mt-0 mb-4 text-[#333] text-[1.2rem]">{{ $t('home.history') }}</h3>
+      <div v-if="datesError" class="p-4 bg-[#ffeeee] text-[#cc3333] rounded border border-[#ffcccc]">
+        {{ $t('home.error_loading_dates') }}: {{ datesError }}
+      </div>
+      <div v-else-if="!dates || dates.length === 0" class="p-4 text-[#999] text-center">
+        {{ $t('home.no_dates') }}
+      </div>
       <History v-else :dates="dates" @click-date="goToDate" />
     </div>
   </div>
 </template>
-
-<style scoped>
-.container {
-  display: flex;
-  min-height: 100vh;
-  position: relative;
-}
-
-.main {
-  flex: 1;
-  padding: 2rem;
-  transition: margin-right 0.3s ease;
-}
-
-.container.sidebar-open .main {
-  margin-right: 280px;
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.btn {
-  padding: 0.6rem 1.2rem;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s;
-}
-
-.btn:hover {
-  background: #f5f5f5;
-  border-color: #999;
-}
-
-.btn.primary {
-  background: #007bff;
-  color: white;
-  border-color: #007bff;
-}
-
-.btn.primary:hover {
-  background: #0056b3;
-  border-color: #0056b3;
-}
-
-.btn.toggle {
-  margin-left: auto;
-}
-
-.form-wrap {
-  background: #f9f9f9;
-  padding: 1.5rem;
-  border-radius: 6px;
-  margin-bottom: 1.5rem;
-  border: 1px solid #e0e0e0;
-}
-
-.error {
-  padding: 1rem;
-  background: #fee;
-  color: #c33;
-  border-radius: 4px;
-  border: 1px solid #fcc;
-}
-
-.loading {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-}
-
-.empty {
-  padding: 1rem;
-  color: #999;
-  text-align: center;
-}
-
-h1 {
-  margin: 0 0 1.5rem 0;
-  color: #333;
-  font-size: 1.8rem;
-  font-weight: 600;
-}
-
-.content-wrapper {
-  display: flex;
-  gap: 2rem;
-  align-items: flex-start;
-}
-
-.sidebar {
-  position: fixed;
-  right: 0;
-  top: 60px;
-  width: 280px;
-  height: calc(100vh - 60px);
-  background: white;
-  border-left: 1px solid #ddd;
-  padding: 1.5rem;
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
-  overflow-y: auto;
-  box-shadow: -2px 0 8px rgba(0,0,0,0.1);
-}
-
-.sidebar.open {
-  transform: translateX(0);
-}
-
-.sidebar h3 {
-  margin: 0 0 1rem 0;
-  color: #333;
-  font-size: 1.2rem;
-}
-</style>

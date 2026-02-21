@@ -1,10 +1,10 @@
 import About from '@/views/About.vue'
 import Home from '@/views/Home.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
-import LiveTask from '@/views/LiveTask.vue'
+import AddForm from '@/views/AddForm.vue'
+import { authGaurd } from '@/middleware/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +22,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: "/add",
+      name: "Add",
+      component: AddForm,
+      meta: {requiresAuth: true}
+    },
+    {
       path: "/login",
       name: "Login",
       component: Login
@@ -31,22 +37,9 @@ const router = createRouter({
       name: "Register",
       component: Register
     },
-    {
-      path: "/live",
-      name: "Live",
-      component: LiveTask
-    }
   ],
 })
 
-router.beforeEach((to, from, next) => { 
-  const authStore = useAuthStore()
-
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/login')
-  } else {
-    next()
-  }
-})
+router.beforeEach(authGaurd)
 
 export default router

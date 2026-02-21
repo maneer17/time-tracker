@@ -22,7 +22,7 @@ class StoreTimeEntryRequest extends FormRequest
     public function rules(): array
     {
         return [
-        "label"=> "required",
+        "label"=> "required|max:255",
         "start_time" => "required|date_format:H:i",
         "end_time"   => "required|date_format:H:i|after:start_time"
         ];

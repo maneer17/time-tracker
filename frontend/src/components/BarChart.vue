@@ -1,5 +1,5 @@
 <template>
-  <div class="chart-container">
+  <div class="h-[250px] max-w-[900px] mt-8">
     <Bar
       id="my-chart-id"
       :options="chartOptions"
@@ -11,7 +11,6 @@
 <script setup>
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
-import { ref } from 'vue'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -21,47 +20,26 @@ const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    legend: {
-      display: false,
-    },
-    tooltip: {
-      enabled: false, 
-    }
+    legend: { display: false },
+    tooltip: { enabled: false }
   },
   scales: {
     x: {
-      grid: {
-        display: false,
-      },
-      ticks: {
-        font: {
-          size: 10,
-        },
-      },
-      border: {
-        display: false,
-      }
+      grid: { display: false },
+      ticks: { font: { size: 10 } },
+      border: { display: false }
     },
     y: {
       beginAtZero: true,
-      grid: {
-        display: true,
-      },
-      ticks: {
-        font: {
-          size: 9,
-        },
-        padding: 2,
-      },
-      border: {
-        display: true,
-      }
+      grid: { display: true },
+      ticks: { font: { size: 9 }, padding: 2 },
+      border: { display: true }
     }
   },
   datasets: {
     bar: {
-      barPercentage: 0.5,     
-      categoryPercentage: 0.7  
+      barPercentage: 0.5,
+      categoryPercentage: 0.7
     }
   },
   elements: {
@@ -73,12 +51,3 @@ const chartOptions = {
   }
 }
 </script>
-
-<style scoped>
-.chart-container {
-  height: 250px;
-  max-width: 900px;
-  margin-top: 2rem;
-
-}
-</style>

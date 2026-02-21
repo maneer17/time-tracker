@@ -1,119 +1,85 @@
 <script setup>
-import {ref} from 'vue'
-import Store from '@/composables/store'
+import { ref } from 'vue'
+import { Store } from '@/composables/useTimeEntries'
 import { useRouter } from 'vue-router' 
 
 const router = useRouter() 
-const label = ref('')
-const startTime = ref('')
-const endTime = ref('')
-const emit = defineEmits(['data-submitted']);
-const response = ref(null)
+const formData = ref({
+  label: '',
+  startTime: '',
+  endTime: '',
+});
 const errors = ref(null)
 
-const handleSubmit = async ()=> {
+const handleSubmit = async () => {
     errors.value = null
-    console.log(startTime.value)
-    const result =await Store('/api/time-entries',{
-        label: label.value,
-        start_time: startTime.value,
-        end_time: endTime.value
+    const result = await Store('/api/time-entries', {
+        label: formData.value.label,
+        start_time: formData.value.startTime,
+        end_time: formData.value.endTime
     })
-    if(result.success)
-        emit('data-submitted')
-        
-    else if(!result.success && result.errors){
+
+    if (result.success) {
+        router.push({ name: 'Home' })
+    } else if (result.errors) {
         errors.value = result.errors
-    }
-    else{
-        router.push({name: 'Home'})
+    } else {
+        errors.value = { message: ['Something went wrong'] }
     }
 }
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit">
-    <div class="field">
-      <label>{{ $t("addForm.label") }}</label>
-      <input type="text" v-model="label" required>
-      <span v-if="errors?.label" class="err">{{ errors.label[0] }}</span>
-    </div>
+  <div class="min-h-screen flex items-center justify-center bg-[#f5f5f5] p-8">
+    <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-[500px]">
+      
+      <div class="mb-6">
+        <h2 class="m-0 text-[#333] text-2xl font-semibold">{{ $t('addForm.add_entry') }}</h2>
+      </div>
 
-    <div class="field">
-      <label>{{ $t("addForm.start_time") }}</label>
-      <input type="time" v-model="startTime" required>
-      <span v-if="errors?.start_time" class="err">{{ errors.start_time[0] }}</span>
-    </div>
+      <form @submit.prevent="handleSubmit" class="max-w-[500px]">
+        <div class="mb-5">
+          <label class="block mb-1.5 text-[#555] text-[0.9rem] font-medium">{{ $t("addForm.label") }}</label>
+          <input 
+            type="text" 
+            v-model="formData.label" 
+            required
+            class="w-full px-2.5 py-2 border border-[#ddd] rounded text-[0.95rem] transition-colors duration-200 box-border focus:outline-none focus:border-[#007bff]"
+          >
+          <span v-if="errors?.label" class="block mt-1 text-[#cc3333] text-[0.85rem]">{{ errors.label[0] }}</span>
+        </div>
 
-    <div class="field">
-      <label>{{ $t("addForm.end_time") }}</label>
-      <input type="time" v-model="endTime" required>
-      <span v-if="errors?.end_time" class="err">{{ errors.end_time[0] }}</span>
-    </div>
+        <div class="mb-5">
+          <label class="block mb-1.5 text-[#555] text-[0.9rem] font-medium">{{ $t("addForm.start_time") }}</label>
+          <input 
+            type="time" 
+            v-model="formData.startTime" 
+            required
+            class="w-full px-2.5 py-2 border border-[#ddd] rounded text-[0.95rem] transition-colors duration-200 box-border focus:outline-none focus:border-[#007bff]"
+          >
+          <span v-if="errors?.start_time" class="block mt-1 text-[#cc3333] text-[0.85rem]">{{ errors.start_time[0] }}</span>
+        </div>
 
-    <button type="submit" class="submit">{{ $t("addForm.add_entry") }}</button>
-    <p v-if="response" class="success">{{ response.data }}</p>
-  </form>
+        <div class="mb-5">
+          <label class="block mb-1.5 text-[#555] text-[0.9rem] font-medium">{{ $t("addForm.end_time") }}</label>
+          <input 
+            type="time" 
+            v-model="formData.endTime" 
+            required
+            class="w-full px-2.5 py-2 border border-[#ddd] rounded text-[0.95rem] transition-colors duration-200 box-border focus:outline-none focus:border-[#007bff]"
+          >
+          <span v-if="errors?.end_time" class="block mt-1 text-[#cc3333] text-[0.85rem]">{{ errors.end_time[0] }}</span>
+        </div>
+
+        <div v-if="errors?.message" class="mb-4 px-2.5 py-2 text-[#cc3333] text-[0.85rem] bg-[#ffeeee] border border-[#ffcccc] rounded">
+          {{ errors.message[0] }}
+        </div>
+
+        <button 
+          type="submit"
+          class="w-full py-3 px-6 bg-[#28a745] text-white border-none rounded cursor-pointer text-base transition-colors duration-200 mt-2 hover:bg-[#218838]"
+        >{{ $t("addForm.add_entry") }}</button>
+      </form>
+    </div>
+  </div>
 </template>
-
-<style scoped>
-form {
-  max-width: 500px;
-}
-
-.field {
-  margin-bottom: 1.2rem;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.4rem;
-  color: #555;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-input {
-  width: 100%;
-  padding: 0.6rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s;
-}
-
-input:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
-.err {
-  display: block;
-  margin-top: 0.3rem;
-  color: #c33;
-  font-size: 0.85rem;
-}
-
-.submit {
-  padding: 0.7rem 1.5rem;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.2s;
-}
-
-.submit:hover {
-  background: #218838;
-}
-
-.success {
-  margin-top: 1rem;
-  padding: 0.8rem;
-  background: #d4edda;
-  color: #155724;
-  border-radius: 4px;
-}
-</style>
