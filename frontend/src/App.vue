@@ -37,6 +37,3 @@ watch(locale, (newLocale) => {
     <router-view />
   </div>
 </template>
-```
-
-That's all of them! Are you done or do you have more?

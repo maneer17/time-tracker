@@ -16,6 +16,3 @@ const props = defineProps(['entry'])
     </span>
   </div>
 </template>
-```
-
-Send the next one.
