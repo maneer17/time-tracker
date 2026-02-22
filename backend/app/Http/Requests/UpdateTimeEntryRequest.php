@@ -22,7 +22,9 @@ class UpdateTimeEntryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "end_time" => "|date_format:H:i|after:start_time"
+                "label"=> "sometimes|max:255",
+                "start_time" => "sometimes|date_format:H:i",
+                "end_time" => "sometimes|date_format:H:i|after:start_time"
         ];
     }
 }

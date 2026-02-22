@@ -23,18 +23,7 @@ export const useAuthStore = defineStore('authStore', {
     return { success: true }
 
   } catch (error) { 
-    if (error.response) {
-      const errorData = error.response.data
-      return { 
-        success: false, 
-        errors: errorData 
-      }
-    } else {
-      return { 
-        success: false, 
-        errors: { message: 'Network error. Please try again.' } 
-      }
-    }
+      return {success: false}
   }
 }
 ,
@@ -52,18 +41,7 @@ export const useAuthStore = defineStore('authStore', {
         return { success: true };
         
       } catch (error) {
-        if (error.response) {
-          console.log(error.response)
-          return { 
-            success: false, 
-            errors: error.response.data 
-          };
-        } else {
-          return { 
-            success: false, 
-            errors: { message: 'Network error. Please try again.' } 
-          };
-        }
+         return {success: false}
       }
     },
     
@@ -78,18 +56,7 @@ export const useAuthStore = defineStore('authStore', {
         return { success: true };
         
       } catch (error) {
-        if (error.response) {
-          console.log(error.response)
-          return { 
-            success: false, 
-            errors: error.response.data 
-          };
-        } else {
-          return { 
-            success: false, 
-            errors: { message: 'Network error. Please try again.' } 
-          };
-        }
+          return {success: false}
       }
     },
     

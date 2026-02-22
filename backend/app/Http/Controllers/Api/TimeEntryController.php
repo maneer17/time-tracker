@@ -52,6 +52,6 @@ class TimeEntryController extends Controller
     public function destroy(TimeEntry $time_entry)
     {
         $time_entry->delete();
-        return $time_entry;
+        return new TimeEntryResource($time_entry);
     }
 }

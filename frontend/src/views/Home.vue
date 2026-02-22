@@ -1,9 +1,10 @@
 <script setup>
-import { useFetch} from '@/composables/useTimeEntries'
-import { ref, computed } from 'vue'
+import useApi from '@/composables/useApi'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import History from './History.vue'
 import ListView from '@/components/ListView.vue'
+import timeEntryService from '@/services/timeEntryService'
 
 const { t } = useI18n()
 const filters = ref({
@@ -11,20 +12,20 @@ const filters = ref({
   date: null,
   sort: ''
 })
-const url = computed(() => {
-  let query = ''
-  if (filters.value.date) query += `&date=${filters.value.date}`
-  if (filters.value.search) query += `&search=${filters.value.search}`
-  if (filters.value.sort) query += `&sort=${filters.value.sort}`
-  return `/api/time-entries${query ? '?' + query.slice(1) : ''}`
+
+// re-fetches automatically when filters change
+const { data: entries, error , request} = useApi(()=>timeEntryService.getTimeEntries(filters.value), true)
+watch(filters,()=>{
+  request(filters);
 })
+// static — params never change, fires once
+const { data: dates, error: datesError } = useApi(()=>timeEntryService.getTimeEntries({history: true}),true)
 const title = ref(`${t('home.today_entries')}`)
 const showHistory = ref(false)
 const historyButtonText = computed(() =>
   showHistory.value ? `← ${t('home.hide')}` : `${t('home.history')} →`
 )
-const { data: entries, error } = useFetch(url)
-const { data: dates, error: datesError } = useFetch('/api/time-entries?history=true')
+
 
 const toggleHistory = () => {
   showHistory.value = !showHistory.value

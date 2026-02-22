@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue'
-import { Store } from '@/composables/useTimeEntries'
 import { useRouter } from 'vue-router' 
 
 const router = useRouter() 
@@ -9,23 +8,17 @@ const formData = ref({
   startTime: '',
   endTime: '',
 });
-const errors = ref(null)
+
+const { loading, error, request } = useApi(timeEntryService.createTimeEntry)
 
 const handleSubmit = async () => {
-    errors.value = null
-    const result = await Store('/api/time-entries', {
-        label: formData.value.label,
-        start_time: formData.value.startTime,
-        end_time: formData.value.endTime
-    })
+  await request({
+    label: formData.value.label,
+    start_time: formData.value.startTime,
+    end_time: formData.value.endTime
+  })
 
-    if (result.success) {
-        router.push({ name: 'Home' })
-    } else if (result.errors) {
-        errors.value = result.errors
-    } else {
-        errors.value = { message: ['Something went wrong'] }
-    }
+  if (!error.value) router.push({ name: 'Home' })
 }
 </script>
 
