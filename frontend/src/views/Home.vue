@@ -1,6 +1,6 @@
 <script setup>
 import useApi from '@/composables/useApi'
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import History from './History.vue'
 import ListView from '@/components/ListView.vue'
@@ -15,9 +15,10 @@ const filters = ref({
 
 // re-fetches automatically when filters change
 const { data: entries, error , request} = useApi(()=>timeEntryService.getTimeEntries(filters.value), true)
-watch(filters,()=>{
-  request(filters);
-})
+
+watchEffect(() => {
+    request()
+  })
 // static — params never change, fires once
 const { data: dates, error: datesError } = useApi(()=>timeEntryService.getTimeEntries({history: true}),true)
 const title = ref(`${t('home.today_entries')}`)

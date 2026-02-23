@@ -65,6 +65,9 @@ legacy: false,
       },
       single_entry: {
         hour: '0 hours | {n} hour | {n} hours',
+          "confirm_delete": "Are you sure?",
+          "yes": "Yes",
+           "no": "No",
         minute: '0 minutes | {n} minute | {n} minutes'
       }
 
@@ -119,7 +122,10 @@ legacy: false,
       },
       single_entry: {
         hour: 'صفر  ساعات | {n} ساعة | {n} ساعات',
-        minute: 'صفر دقائق | {n} دقيقة | {n} دقائق'
+        minute: 'صفر دقائق | {n} دقيقة | {n} دقائق',
+          "confirm_delete": "هل أنت متأكد؟",
+          "yes": "نعم",
+          "no": "لا"
       }      
     },
   },

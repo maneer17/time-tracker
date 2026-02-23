@@ -1,4 +1,3 @@
-// src/composables/useApi.js
 import { ref } from 'vue';
 
 const useApi = (apiFunc, immediate = false) => {
@@ -11,15 +10,14 @@ const useApi = (apiFunc, immediate = false) => {
     error.value = null;
     try {
       const result = await apiFunc(...args);
-      data.value = result.data?.data ?? result.data;  // Make sure this matches your API response structure
+      data.value = result.data?.data ?? result.data;
     } catch (err) {
-      error.value = err.message;
+      error.value = err.response?.data?.errors ?? err.message;
     } finally {
       loading.value = false;
     }
   };
 
-  // Auto-fetch if immediate is true
   if (immediate) {
     request();
   }
