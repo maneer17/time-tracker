@@ -6,22 +6,24 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\StoreUserRequest; 
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function store(Request $request){
-        $validated = $request->validate([
-            "name" =>"required",
-            "email"=>"required|email",
-            "password"=>"required"
-        ]);
-        $user = User::create($validated);
-         $token = $user->createToken('api-token')->plainTextToken;
-        return response()->json([
-            'token'=> $token
-        ]);
-    }
+    public function store(StoreUserRequest $request)
+{
+    $validated = $request->validated();
+
+    $user = User::create($validated);
+
+    $token = $user->createToken('api-token')->plainTextToken;
+
+    return response()->json([
+        'token' => $token,
+        'user' => $user
+    ]);
+}
     public function login(Request $request){
         $request->validate([
             "email"=>"required|email",
@@ -42,12 +44,14 @@ class AuthController extends Controller
         }
         $token = $user->createToken('api-token')->plainTextToken;
         return response()->json([
-            'token'=> $token
+            'token'=> $token,
+            'user' => $user
         ]);
     }
 
     public function logout(Request $request){
-        $request->user()->tokens()->delete();
-        return response()->json(["message"=>"logged out successfully"]);
+        $user = $request->user();
+        $user->tokens()->delete();
+        return response()->json(["message" => "Logged out successfully " . $user->name]);
     }
 }

@@ -1,142 +1,82 @@
-<template>
-  <div class="container">
-    <h2>Create Time Entry</h2>
-
-    <!-- Success Message -->
-    <p v-if="success" class="success">
-      {{ success }}
-    </p>
-
-    <!-- General Error -->
-    <p v-if="errors.general" class="error">
-      {{ errors.general[0] }}
-    </p>
-
-    <form @submit.prevent="handleSubmit">
-      <div class="field">
-        <label>Label</label>
-        <input
-          type="text"
-          v-model="formData.label"
-          :disabled="loading"
-        />
-        <small v-if="errors.label" class="error">
-          {{ errors.label[0] }}
-        </small>
-      </div>
-
-      <div class="field">
-        <label>Start Time</label>
-        <input
-          type="time"
-          v-model="formData.start_time"
-          :disabled="loading"
-        />
-        <small v-if="errors.start_time" class="error">
-          {{ errors.start_time[0] }}
-        </small>
-      </div>
-
-      <div class="field">
-        <label>End Time</label>
-        <input
-          type="time"
-          v-model="formData.end_time"
-          :disabled="loading"
-        />
-        <small v-if="errors.end_time" class="error">
-          {{ errors.end_time[0] }}
-        </small>
-      </div>
-
-      <button type="submit" :disabled="loading">
-        {{ loading ? 'Saving...' : 'Save' }}
-      </button>
-    </form>
-  </div>
-</template>
-
-<script>
+<script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import apiClient from '@/services/api'
+import useApi from '@/composables/useApi';
+import timeEntryService from '@/services/timeEntryService';
 
-export default {
-  name: 'CreateTimeEntry',
+const router = useRouter()
+const formData = ref({
+  label: '',
+  startTime: '',
+  endTime: '',
+});
 
-  setup() {
-    const router = useRouter()
+const { loading, error, request } = useApi(() =>
+  timeEntryService.createTimeEntry({
+    label: formData.value.label,
+    start_time: formData.value.startTime,
+    end_time: formData.value.endTime
+  })
+)
 
-    const loading = ref(false)
-    const success = ref(null)
-    const errors = ref({})
-
-    const formData = ref({
-      label: '',
-      start_time: '',
-      end_time: ''
-    })
-
-    const handleSubmit = async () => {
-      loading.value = true
-      errors.value = {}
-      success.value = null
-
-      try {
-        await apiClient.post('/api/time-entries', formData.value)
-
-        success.value = 'Entry added successfully!'
-        formData.value = {
-          label: '',
-          start_time: '',
-          end_time: ''
-        }
-
-        router.push('/')
-      } catch (err) {
-        if (err.response && err.response.status === 422) {
-          errors.value = err.response.data.errors
-        } else {
-          errors.value = {
-            general: ['Something went wrong. Please try again.']
-          }
-        }
-      } finally {
-        loading.value = false
-      }
-    }
-
-    return {
-      formData,
-      handleSubmit,
-      loading,
-      success,
-      errors
-    }
-  }
+const submit = async () => {
+  await request()
+  if (!error.value) router.push({ name: 'Home' })
 }
 </script>
 
-<style scoped>
-.container {
-  max-width: 400px;
-}
+<template>
+  <div class="min-h-screen flex items-center justify-center bg-[#f5f5f5] p-8">
+    <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-[500px]">
+      
+      <div class="mb-6">
+        <h2 class="m-0 text-[#333] text-2xl font-semibold">{{ $t('addForm.add_entry') }}</h2>
+      </div>
 
-.field {
-  margin-bottom: 12px;
-}
+      <form @submit.prevent="submit" class="max-w-[500px]">
+        <div class="mb-5">
+          <label class="block mb-1.5 text-[#555] text-[0.9rem] font-medium">{{ $t("addForm.label") }}</label>
+          <input 
+            type="text" 
+            v-model="formData.label" 
+            required
+            class="w-full px-2.5 py-2 border border-[#ddd] rounded text-[0.95rem] transition-colors duration-200 box-border focus:outline-none focus:border-[#007bff]"
+          >
+          <span v-if="error?.label" class="block mt-1 text-[#cc3333] text-[0.85rem]">{{ error.label[0] }}</span>
+        </div>
 
-.error {
-  color: red;
-  font-size: 0.85rem;
-}
+        <div class="mb-5">
+          <label class="block mb-1.5 text-[#555] text-[0.9rem] font-medium">{{ $t("addForm.start_time") }}</label>
+          <input 
+            type="time" 
+            v-model="formData.startTime" 
+            required
+            class="w-full px-2.5 py-2 border border-[#ddd] rounded text-[0.95rem] transition-colors duration-200 box-border focus:outline-none focus:border-[#007bff]"
+          >
+          <span v-if="error?.start_time" class="block mt-1 text-[#cc3333] text-[0.85rem]">{{ error.start_time[0] }}</span>
+        </div>
 
-.success {
-  color: green;
-  font-size: 0.9rem;
-}
+        <div class="mb-5">
+          <label class="block mb-1.5 text-[#555] text-[0.9rem] font-medium">{{ $t("addForm.end_time") }}</label>
+          <input 
+            type="time" 
+            v-model="formData.endTime" 
+            required
+            class="w-full px-2.5 py-2 border border-[#ddd] rounded text-[0.95rem] transition-colors duration-200 box-border focus:outline-none focus:border-[#007bff]"
+          >
+          <span v-if="error?.end_time" class="block mt-1 text-[#cc3333] text-[0.85rem]">{{ error.end_time[0] }}</span>
+        </div>
 
-button {
-  margin-top: 10px;
-}
-</style>
+        <div v-if="error?.message" class="mb-4 px-2.5 py-2 text-[#cc3333] text-[0.85rem] bg-[#ffeeee] border border-[#ffcccc] rounded">
+          {{ error.message }}
+        </div>
+
+        <button 
+          type="submit"
+          :disabled="loading"
+          class="w-full py-3 px-6 bg-[#28a745] text-white border-none rounded cursor-pointer text-base transition-colors duration-200 mt-2 hover:bg-[#218838] disabled:opacity-50 disabled:cursor-not-allowed"
+        >{{ loading ? $t("addForm.loading") : $t("addForm.add_entry") }}</button>
+      </form>
+    </div>
+  </div>
+</template>

@@ -1,58 +1,45 @@
+import About from '@/views/About.vue'
+import Home from '@/views/Home.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import TodayEntries from '../views/TodayEntries.vue'
-import DateEntries from '../views/DateEntries.vue'
-import AddForm from '../views/AddForm.vue'
-import HistorySidebar from '../views/HistorySidebar.vue'
-import Login from '../views/Login.vue'
-import SignUp from '@/views/SignUp.vue'
-import { compile } from 'vue'
-
-const routes = [
-  {
-    path: '/',
-    name: 'today',
-    component: TodayEntries,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/date/:date',
-    name: 'date-entries',
-    component: DateEntries,
-    props: true,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/add',
-    name: 'add',
-    component: AddForm,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: Login
-  },
-  {
-    path: '/signup',
-    name: 'signup',
-    component: SignUp
-  }
-]
+import Login from '@/views/Login.vue'
+import Register from '@/views/Register.vue'
+import AddForm from '@/views/AddForm.vue'
+import { authGaurd } from '@/middleware/auth'
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: "/",
+      name: "Home",
+      component: Home,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: "/about",
+      name: "About",
+      component: About,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: "/add",
+      name: "Add",
+      component: AddForm,
+      meta: {requiresAuth: true}
+    },
+    {
+      path: "/login",
+      name: "Login",
+      component: Login
+    },
+    {
+      path: "/register",
+      name: "Register",
+      component: Register
+    },
+  ],
 })
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('authToken')
-  
-  if (to.meta.requiresAuth && !token) {
-    next('/login')
-  } else if (to.name === 'login' && token) {
-    next('/') 
-  } else {
-    next()
-  }
-})
+
+router.beforeEach(authGaurd)
 
 export default router
