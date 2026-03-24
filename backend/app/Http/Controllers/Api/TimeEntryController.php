@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api; 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreTimeEntryRequest; 
-use App\Http\Requests\UpdateTimeEntryRequest; 
+namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\{StoreTimeEntryRequest, UpdateTimeEntryRequest};
 use App\Http\Resources\TimeEntryResource;
 use App\Models\TimeEntry;
 
@@ -13,22 +12,32 @@ class TimeEntryController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['date', 'sort', 'search', 'history']);
+
         if ($request->boolean('history')) {
             $dates = auth()->user()
                 ->time_entries()
                 ->history()
-                ->pluck('date');
+                ->paginate(15);
 
-            return response()->json($dates);
+            return response()->json([
+                'data' => $dates->pluck('date'),
+                'current_page' => $dates->currentPage(),
+                'last_page' => $dates->lastPage(),
+                'per_page' => $dates->perPage(),
+                'total' => $dates->total(),
+                'from' => $dates->firstItem(),
+                'to' => $dates->lastItem(),
+            ]);
         }
 
         $time_entries = auth()->user()
             ->time_entries()
             ->search($filters)
-            ->paginate(15);
+            ->paginate(10);
 
         return TimeEntryResource::collection($time_entries);
     }
+
 
     public function store(StoreTimeEntryRequest $request)
     {
