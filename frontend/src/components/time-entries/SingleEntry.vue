@@ -29,7 +29,7 @@ const { loading, error, request } = useApi(
   () => timeEntryService.deleteTimeEntry(props.entry.id)
 )
 const { loading: updatingLoading, error: updatingError, request: updatingRequest } = useApi(
-  () => timeEntryService.updateTimeEntry(formData, props.entry.id)
+  () => timeEntryService.updateTimeEntry(formData.value, props.entry.id)
 )
 
 const remove = async () => {
