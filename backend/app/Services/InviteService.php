@@ -35,7 +35,7 @@ class InviteService
 
     private function ensureNotOwner(User $user, Channel $channel): void
     {
-        if ($channel->user_id === $user->id) {
+        if ($channel->isOwner($user)) {
             throw ValidationException::withMessages([
                 'identifier' => ['You cannot invite the channel owner.'],
             ]);
@@ -44,7 +44,7 @@ class InviteService
 
     private function ensureNotMember(User $user, Channel $channel): void
     {
-        if ($channel->members()->where('user_id', $user->id)->exists()) {
+        if ($channel->isMember($user)) {
             throw ValidationException::withMessages([
                 'identifier' => ['This user is already a member of this channel.'],
             ]);
