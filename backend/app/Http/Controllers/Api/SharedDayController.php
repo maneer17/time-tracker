@@ -58,12 +58,11 @@ class SharedDayController extends Controller
         return SharedDayResource::collection($sharedDays);
     }
 
-    // DELETE /channels/{channel}/shared-days/{shared_day}
     public function destroy(Channel $channel, SharedDay $sharedDay)
     {
         $this->authorize('delete', $sharedDay);
 
         $sharedDay->delete();
-        return response()->json(['message' => 'Shared day removed successfully.']);
+        return new SharedDayResource($sharedDay);
     }
 }

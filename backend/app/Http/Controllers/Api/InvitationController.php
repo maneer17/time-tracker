@@ -34,17 +34,6 @@ class InvitationController extends Controller
         return new InvitationResource($invitation);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateInvitationRequest $request, Channel $channel, Invitation $invitation, InvitationStatusService $service)
     {
         $validated = $request->validated();
@@ -60,11 +49,4 @@ class InvitationController extends Controller
         return new InvitationResource($invitation);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

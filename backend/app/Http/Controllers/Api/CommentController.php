@@ -48,6 +48,6 @@ class CommentController extends Controller
 
         $comment->delete();
 
-        return response()->json(['message' => 'Comment removed successfully.']);
+        return new CommentResource($comment);
     }
 }
