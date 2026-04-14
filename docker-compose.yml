@@ -11,6 +11,11 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_USER: manar
       MYSQL_PASSWORD: manar21
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5  
     volumes:
       - db_data:/var/lib/mysql
     networks:
@@ -29,14 +34,14 @@ services:
     container_name: laravel_app
     restart: unless-stopped
     volumes:
-      # Sync your local backend/ folder with the container.
-      # Code changes on your machine instantly reflect in the container.
       - ./backend:/var/www/html
     env_file:
       - ./backend/.env             
     depends_on:
-      - db                         
-      - redis 
+      db:
+        condition: service_healthy                     
+      redis:
+          condition: service_started
     command: >
       sh -c "chown -R www-data:www-data /var/www/html/storage
       && chown -R www-data:www-data /var/www/html/bootstrap/cache
