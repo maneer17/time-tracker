@@ -3,10 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Models\Invitation;
-use App\Models\TimeEntry;
-use App\Observers\InvitationObserver;
-use App\Observers\TimeEntryObserver;
+use App\Models\{Invitation, TimeEntry};
+use App\Observers\{InvitationObserver, TimeEntryObserver};
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -15,9 +13,15 @@ class AppServiceProvider extends ServiceProvider
 /**
  * Register any application services.
  */
+/**
+ * Register any application services.
+ */
     public function register(): void
     {
-        
+        if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+            $this->app->register(TelescopeServiceProvider::class);
+        }
     }
 
     /**

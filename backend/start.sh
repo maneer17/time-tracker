@@ -1,6 +1,7 @@
 #!/bin/bash
 composer install --no-interaction --optimize-autoloader
-
+composer require laravel/telescope --dev
+php artisan telescope:install
 php artisan migrate --force
 php artisan db:seed --force        
 

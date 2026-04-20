@@ -13,10 +13,12 @@ use App\Http\Controllers\Api\{
     MeController,
     ReportController
 };
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::middleware('guest')->controller(AuthController::class)->group(function () {
+
+Route::controller(AuthController::class)->group(function () {
     Route::post('/register', 'store');
     Route::post('/login', 'login');
 });
@@ -36,9 +38,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('channels.shared-days', SharedDayController::class)
         ->only(['index', 'destroy', 'show']);
     Route::apiResource('channels.shared-days.comments', CommentController::class)
-    ->only(['index', 'update', 'destroy', 'store']);
+        ->only(['index', 'update', 'destroy', 'store']);
 
-    Route::get('reports',[ReportController::class,'index']);
+    Route::get('reports', [ReportController::class, 'index']);
+
     Route::prefix('me')->group(function () {
         Route::get('shared-days',  [MeController::class, 'sharedDays']);
         Route::get('invitations',  [MeController::class, 'invitations']);

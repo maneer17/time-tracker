@@ -3,7 +3,7 @@ import ERROR_MESSAGES from '../config/customErrors';
 const toast = useToast();
 import axios from 'axios';
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'http://localhost',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
