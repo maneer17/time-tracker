@@ -22,7 +22,7 @@ class TimeEntryResource extends JsonResource
             'start_time' => $this->start_time->format('g:i a'),
             'end_time' => $this->end_time->format('g:i a'),
             'time_taken' => $this->time_taken,
-            'create_at' => $this->created_at
+            'created_at' => $this->created_at
             
               ];
     
