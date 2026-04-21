@@ -1,6 +1,5 @@
 #!/bin/bash
 composer install --no-interaction --optimize-autoloader
-php artisan telescope:install
 php artisan migrate --force
 php artisan db:seed --force        
 
