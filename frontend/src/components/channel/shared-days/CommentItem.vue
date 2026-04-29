@@ -14,7 +14,6 @@ const editBody = ref(props.comment.body)
 const commentStore = useCommentStore();
 const { data: updatedComment, loading: updateLoading, error: updateError, request: updateRequest } = useApi(
     () => commentService.updateComment(
-        sharedDay.value.channel_id,
         sharedDay.value.id,
         props.comment.id,
         { body: editBody.value }
@@ -24,7 +23,6 @@ const { data: updatedComment, loading: updateLoading, error: updateError, reques
 
 const { loading: deleteLoading, error: deleteError, request: deleteRequest } = useApi(
     () => commentService.deleteComment(
-        sharedDay.value.channel_id,
         sharedDay.value.id,
         props.comment.id
     )

@@ -11,17 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('shared_days', function (Blueprint $table) {
-            $table->unique(['channel_id', 'user_id', 'date'], 'unique_channel_user_date');
+        Schema::table('channels', function (Blueprint $table) {
             $table->index('user_id', 'idx_user_id');
+            $table->index('created_at', 'idx_created_at');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::table('shared_days', function (Blueprint $table) {
-            $table->dropUnique('unique_channel_user_date');
+        Schema::table('channels', function (Blueprint $table) {
             $table->dropIndex('idx_user_id');
+            $table->dropIndex('idx_created_at');
         });
-}
+    }
 };

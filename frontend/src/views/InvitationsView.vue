@@ -1,13 +1,16 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 import invitationService from '@/services/invitationService'
-import useApi from '@/composables/useApi'
+import { usePagination } from '@/composables/usePagination'
+import AppPagination from '@/components/AppPagination.vue'
 import InvitationCard from '@/components/invitations/InvitationCard.vue'
 
 const { t } = useI18n()
-const { data: invitations, error, request: refresh } = useApi(
-    () => invitationService.getMyInvitations(), true
+const { items: invitations, paginatorData, loading, error, goToPage, refresh } = usePagination(
+    (page) => invitationService.getMyInvitations({page}),
+    { immediate: true }
 )
+
 </script>
 
 <template>
@@ -29,6 +32,11 @@ const { data: invitations, error, request: refresh } = useApi(
                     @accepted="refresh"
                     @declined="refresh" />
             </div>
+
+            <AppPagination 
+                v-if="paginatorData?.meta" 
+                :data="paginatorData" 
+                @page-change="goToPage" />
             <div v-else class="text-center py-16 text-gray-400">
                 {{ t('invitations_view.empty') }}
             </div>

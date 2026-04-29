@@ -16,14 +16,22 @@ class ChannelController extends Controller
 
 
 
-    public function index()
+    public function index(Request $request)
     {
-        $owned = Channel::owned(auth()->user())->latest()->get();
-        $joined = Channel::joined(auth()->user())->latest()->get();
-            return response()->json([
-             'owned' => ChannelResource::collection($owned),
-            'joined' => ChannelResource::collection($joined),
-    ]);
+        $type = $request->input('type'); // owned | joined
+
+        $query = match ($type) {
+            'owned'  => Channel::owned(auth()->user()),
+            'joined' => Channel::joined(auth()->user()),
+            default  => Channel::query(), 
+        };
+
+        $channels = $query
+            ->withCount('members')
+            ->latest()
+            ->paginate($this->paginate);
+
+        return ChannelResource::collection($channels);
     }
 
     /**
@@ -40,7 +48,10 @@ class ChannelController extends Controller
      */
     public function show(Channel $channel)
     {
-        return new ChannelResource($channel->load(['members.user', 'invitations']));
+        $channel->load(['members.user', 'invitations'])
+                ->loadCount('members');
+
+        return new ChannelResource($channel);
     }
 
     /**

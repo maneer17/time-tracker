@@ -4,27 +4,25 @@ import commentService from '@/services/commentService'
 export const useCommentStore = defineStore('commentStore', {
     state: () => ({
         comments: [],
-        currentPage: 1,
-        lastPage: 1,
+        meta: { current_page: 1, last_page: 1 },
         loading: false,
         error: null,
     }),
 
     getters: {
-        hasMore() {
-            return this.currentPage < this.lastPage
-        }
+        hasMore: (state) => state.meta.current_page < state.meta.last_page
     },
 
     actions: {
-        async fetch(channelId, sharedDayId) {
+        async fetch(sharedDayId, page = 1) {
             this.loading = true
             this.error = null
             try {
-                const response = await commentService.getComments(channelId, sharedDayId, 1)
-                this.comments = response.data.data
-                this.lastPage = response.data.meta.last_page
-                this.currentPage = 1
+                const response = await commentService.getComments(sharedDayId, { page })
+                this.comments = page === 1
+                    ? response.data.data
+                    : [...this.comments, ...response.data.data]
+                this.meta = response.data.meta
             } catch (err) {
                 this.error = err.response?.data?.errors ?? err.message
             } finally {
@@ -32,41 +30,17 @@ export const useCommentStore = defineStore('commentStore', {
             }
         },
 
-        async loadMore(channelId, sharedDayId) {
-            this.currentPage++
-            this.loading = true
-            this.error = null
-            try {
-                const response = await commentService.getComments(channelId, sharedDayId, this.currentPage)
-                this.comments = [...this.comments, ...response.data.data]
-                this.lastPage = response.data.meta.last_page
-            } catch (err) {
-                this.currentPage--  // revert page increment if failed
-                this.error = err.response?.data?.errors ?? err.message
-            } finally {
-                this.loading = false
-            }
+        loadMore(sharedDayId) {
+            if (!this.hasMore || this.loading) return
+            this.fetch(sharedDayId, this.meta.current_page + 1)
         },
 
-        add(comment) {
-            this.comments.unshift(comment)
-        },
-
-        remove(id) {
-            this.comments = this.comments.filter(c => c.id !== id)
-        },
-
+        add(comment)    { this.comments.unshift(comment) },
+        remove(id)      { this.comments = this.comments.filter(c => c.id !== id) },
         update(updated) {
-            const index = this.comments.findIndex(c => c.id === updated.id)
-            if (index !== -1) this.comments[index] = updated
+            const i = this.comments.findIndex(c => c.id === updated.id)
+            if (i !== -1) this.comments[i] = updated
         },
-
-        reset() {
-            this.comments = []
-            this.currentPage = 1
-            this.lastPage = 1
-            this.loading = false
-            this.error = null
-        }
+        reset()         { this.$reset() }
     }
 })

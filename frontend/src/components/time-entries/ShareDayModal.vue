@@ -18,10 +18,10 @@ const { data: timeEntries, error: entriesError, loading: entriesLoading } = useA
 )
 
 const { data: channels, error: channelsError, loading: channelsLoading } = useApi(
-    () => channelService.getChannels(), true
+    () => channelService.getChannels({ type: 'owned' }), true
 )
 
-const { data, error, loading, request } = useApi(
+const { error, loading, request } = useApi(
     () => sharedDayService.createSharedDay({
         channel_ids: selectedChannels.value,
         entry_ids: selectedEntries.value,
@@ -53,15 +53,14 @@ const handleSubmit = async () => {
                 <h2 class="text-2xl font-black text-[#333] tracking-tight">{{ t('share_day.title') }}</h2>
             </div>
             <div class="px-5 py-2 bg-[#FEF6E4] rounded-xl">
-                <span class="text-xs font-bold text-[#D4A373] uppercase tracking-widest">
-                    {{ date }}
-                </span>
+                <span class="text-xs font-bold text-[#D4A373] uppercase tracking-widest">{{ date }}</span>
             </div>
         </header>
 
         <form @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto">
             <div class="max-w-4xl mx-auto p-8 md:p-12 space-y-16">
 
+                <!-- Entries -->
                 <section>
                     <div class="flex items-center justify-between mb-8">
                         <h3 class="text-[0.7rem] font-black text-[#A0A0A0] uppercase tracking-[0.2em]">
@@ -113,6 +112,7 @@ const handleSubmit = async () => {
                     </div>
                 </section>
 
+                <!-- Channels -->
                 <section>
                     <div class="mb-8">
                         <h3 class="text-[0.7rem] font-black text-[#A0A0A0] uppercase tracking-[0.2em]">
@@ -124,14 +124,19 @@ const handleSubmit = async () => {
                         <div v-for="i in 2" :key="i" class="h-24 bg-white/50 animate-pulse rounded-[2rem]"></div>
                     </div>
 
-                    <div v-else-if="!channels?.owned?.length"
+                    <div v-else-if="channelsError"
+                        class="p-6 bg-[#FFF2F2] text-[#AF4E4E] rounded-[2rem] border border-[#FFDADA] text-sm font-medium">
+                        {{ t('share_day.error_channels') }}
+                    </div>
+
+                    <div v-else-if="!channels?.length"
                         class="text-center py-20 bg-white/40 rounded-[3rem] border-4 border-dashed border-white/60">
                         <p class="text-[#BCBCBC] font-bold">{{ t('share_day.no_channels') }}</p>
                     </div>
 
                     <div v-else class="grid grid-cols-1 gap-4">
                         <label
-                            v-for="channel in channels.owned"
+                            v-for="channel in channels"
                             :key="channel.id"
                             class="group flex items-center gap-6 p-6 rounded-[2.5rem] border-2 transition-all cursor-pointer"
                             :class="selectedChannels.includes(channel.id)
@@ -165,9 +170,9 @@ const handleSubmit = async () => {
         <footer class="p-8 bg-white/80 backdrop-blur-2xl border-t border-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)] sticky bottom-0">
             <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-6">
 
-                <div v-if="error?.message"
+                <div v-if="error"
                     class="flex-1 text-sm text-[#AF4E4E] font-bold bg-[#FFF2F2] px-6 py-4 rounded-2xl border border-[#FFDADA]">
-                    {{ error.message }}
+                    {{ error }}
                 </div>
 
                 <div v-else class="flex-1 hidden md:block">
@@ -185,7 +190,7 @@ const handleSubmit = async () => {
                     @click="handleSubmit"
                     :disabled="loading || !selectedEntries.length || !selectedChannels.length"
                     class="w-full md:w-auto px-12 py-5 bg-[#5A7D5A] hover:bg-[#4a6b4a] disabled:bg-[#E8F0E8] disabled:text-[#A0A0A0] text-white font-black rounded-[2rem] transition-all shadow-2xl shadow-[#5A7D5A]/20 flex items-center justify-center gap-4 active:scale-95">
-                    <div v-if="loading" class="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <div v-if="loading" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     <span class="tracking-tight">{{ loading ? t('share_day.sharing') : t('share_day.submit') }}</span>
                 </button>
 

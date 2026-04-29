@@ -26,22 +26,19 @@ class StoreSharedDayRequest extends FormRequest
     {
         $validator->after(function ($validator) {
 
-            $hasEntries = TimeEntry::where('user_id', auth()->id())
+            $entryIds = TimeEntry::where('user_id', auth()->id())
                 ->date($this->date)
-                ->exists();
+                ->pluck('id');
 
-            if (!$hasEntries) {
+            if ($entryIds->isEmpty()) {
                 $validator->errors()->add('date', 'This day has no time entries.');
+                return;
             }
 
-
             if ($this->entry_ids) {
-                $validCount = TimeEntry::where('user_id', auth()->id())
-                    ->date($this->date)
-                    ->whereIn('id', $this->entry_ids)
-                    ->count();
+                $invalid = collect($this->entry_ids)->diff($entryIds);
 
-                if ($validCount !== count($this->entry_ids)) {
+                if ($invalid->isNotEmpty()) {
                     $validator->errors()->add(
                         'entry_ids',
                         'Some entries do not belong to this day or to you.'

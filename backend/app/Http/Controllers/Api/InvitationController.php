@@ -18,7 +18,7 @@ class InvitationController extends Controller
             ->pending()
             ->with(['invitedUser', 'channel'])
             ->latest()
-            ->paginate(10);
+            ->paginate($this->paginate);
 
 
         return InvitationResource::collection($invitations);

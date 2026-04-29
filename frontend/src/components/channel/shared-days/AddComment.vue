@@ -13,7 +13,6 @@ const formData = ref({ body: '' })
 
 const { data, error, loading, request } = useApi(
     () => commentService.createComment(
-        sharedDay.value.channel_id,
         sharedDay.value.id,
         formData.value
     )

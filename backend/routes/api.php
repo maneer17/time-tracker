@@ -35,7 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('shared-days', [SharedDayController::class, 'store']);
     Route::apiResource('channels.shared-days', SharedDayController::class)
         ->only(['index', 'destroy', 'show']);
-    Route::apiResource('channels.shared-days.comments', CommentController::class)
+    Route::apiResource('shared-days.comments', CommentController::class)
     ->only(['index', 'update', 'destroy', 'store']);
 
     Route::get('reports',[ReportController::class,'index']);

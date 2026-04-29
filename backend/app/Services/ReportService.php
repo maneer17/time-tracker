@@ -1,9 +1,7 @@
 <?php
 namespace App\Services;
-
+use Illuminate\Support\Facades\{Cache, DB};
 use App\Models\TimeEntry;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Cache;
 class ReportService
 {
 
@@ -27,42 +25,51 @@ class ReportService
     }
 
     private function quickStats(int $userId, ?string $from, ?string $to): array {
-        $stats = TimeEntry::where('user_id', $userId)
+    $stats = TimeEntry::where('user_id', $userId)
         ->inRange($from, $to)
-        ->selectRaw('count(*) as total_entries,
-        SUM(duration_minutes) as total_minutes,
-        COUNT(DISTINCT DATE(created_at)) as total_days
-        ')->first();
-        $totalMinutes = $stats->total_minutes ?? 0;
-        $totalDays    = $stats->total_days ?? 1;
-        $avgMinutesPerDay = $totalDays > 0 ? intdiv($totalMinutes, $totalDays) : 0;
-        return [
-            "total_entries"    => $stats->total_entries ?? 0,
-            "total_hours" => intDiv($totalMinutes,60) ,
-            "total_minutes" => $totalMinutes % 60,
-            "total_days" => $totalDays,
-            "avg_hours_per_day" => intdiv($avgMinutesPerDay, 60),
-            "avg_minutes_per_day" => $avgMinutesPerDay % 60,
-        ];
+        ->selectRaw('
+            COUNT(*) as total_entries,
+            SUM(duration_minutes) as total_minutes,
+            COUNT(DISTINCT DATE(created_at)) as total_days
+
+        ')
+        ->first();
+        // here since I added a compound index  "idx_user_created" the sum and date functions 
+        // won't do a full table scan rather it will just scan the rows that satisfy the condition .
+
+    $totalMinutes     = $stats->total_minutes ?? 0;
+    $totalDays        = $stats->total_days ?? 1;
+    $avgMinutesPerDay = $totalDays > 0 ? intdiv($totalMinutes, $totalDays) : 0;
+
+    return [
+        'total_entries'       => $stats->total_entries ?? 0,
+        'total_hours'         => intdiv($totalMinutes, 60),
+        'total_minutes'       => $totalMinutes % 60,
+        'total_days'          => $totalDays,
+        'avg_hours_per_day'   => intdiv($avgMinutesPerDay, 60),
+        'avg_minutes_per_day' => $avgMinutesPerDay % 60,
+    ];
 
     }
 
 
     private function totalTimeByLabel(int $userId, ?string $from, ?string $to): array
     {
-        $rows = TimeEntry::where('user_id', $userId)
+        return TimeEntry::where('user_id', $userId)
             ->inRange($from, $to)
-            ->selectRaw('label, SUM(duration_minutes) as total_minutes')
+            ->selectRaw('
+                label,
+                SUM(duration_minutes) as total_minutes,
+                FLOOR(SUM(duration_minutes) / 60) as hours,
+                MOD(SUM(duration_minutes), 60) as minutes
+            ')
             ->groupBy('label')
             ->orderByDesc('total_minutes')
-            ->get();
-
-        return $rows->map(fn($row) => [
-            'label'   => $row->label,
-            'hours'   => intdiv($row->total_minutes, 60),
-            'minutes' => $row->total_minutes % 60,
-        ])->toArray();
+            ->get()
+            ->toArray();
     }
+
+
 
 
     private function mostUsedLabels(int $userId, ?string $from, ?string $to): array
@@ -105,33 +112,39 @@ class ReportService
         return $result;
     }
 
+
+
+
+
     private function avgTimePerLabel(int $userId, ?string $from, ?string $to): array
     {
-        $rows = TimeEntry::where('user_id', $userId)
+        return TimeEntry::where('user_id', $userId)
             ->inRange($from, $to)
-            ->selectRaw('label, AVG(duration_minutes) as avg_minutes')
+            ->selectRaw('
+                label,
+                AVG(duration_minutes) as avg_minutes,
+                FLOOR(AVG(duration_minutes) / 60) as hours,
+                MOD(AVG(duration_minutes), 60) as minutes
+            ')
             ->groupBy('label')
             ->orderByDesc('avg_minutes')
-            ->get();
-
-        return $rows->map(fn($row) => [
-            'label'   => $row->label,
-            'hours'   => intdiv((int) $row->avg_minutes, 60),
-            'minutes' => (int) $row->avg_minutes % 60,
-        ])->toArray();
+            ->get()
+            ->toArray();
     }
-
     private function avgLabelsPerDay(int $userId, ?string $from, ?string $to): float
     {
-        $rows = TimeEntry::where('user_id', $userId)
-            ->inRange($from, $to)
-            ->selectRaw('DATE(created_at) as date, COUNT(DISTINCT label) as label_count')
-            ->groupByRaw('DATE(created_at)')
-            ->get();
+        $result = DB::select("
+            SELECT ROUND(AVG(label_count), 1) as avg_labels
+            FROM (
+                SELECT COUNT(DISTINCT label) as label_count
+                FROM time_entries
+                WHERE user_id = ?
+                AND created_at BETWEEN ? AND ?
+                GROUP BY DATE(created_at)
+            ) as daily_counts
+        ", [$userId, $from, $to]);
 
-        if ($rows->isEmpty()) return 0;
-
-        return round($rows->avg('label_count'), 1);
+        return $result[0]->avg_labels ?? 0;
     }
 
 

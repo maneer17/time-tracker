@@ -38,20 +38,21 @@ class TimeEntry extends Model
     }
 
 
-public function scopeDate(Builder $query, string $date): Builder
+public function scopeDate(Builder $query, $date): Builder
 {
-    return $query->whereDate(
-        'created_at',
-        Carbon::parse($date)
-    );
+    $date = $date instanceof Carbon ? $date : Carbon::parse($date);
+
+    return $query
+        ->where('created_at', '>=', $date->copy()->startOfDay())
+        ->where('created_at', '<', $date->copy()->addDay()->startOfDay());
+        // I added copy() because these carbon methdods actullay mutate the instance so we end up ranging the same value
 }
+        
+
 
 public function scopeToday(Builder $query): Builder
 {
-    return $query->whereDate(
-        'created_at',
-        today()
-    );
+    return $query->date(today());
 }
 
 public function scopeSearchByLabel(Builder $query, string $search): Builder {
@@ -72,7 +73,7 @@ public function scopeSort(Builder $query, string $sort): Builder
 public function scopeHistory(Builder $query): Builder
 {
     return $query->selectRaw('DATE(created_at) as date')
-            ->groupBy('date') 
+            ->groupBy('date')
             ->orderBy('date', 'desc');
 }
 public function scopeSearch($query, array $filters): Builder

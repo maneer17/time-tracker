@@ -16,7 +16,7 @@ class MeController extends Controller
             ->pending()
             ->with(['invitedBy', 'channel'])
             ->latest()
-            ->paginate();
+            ->paginate($this->paginate);
 
         return InvitationResource::collection($invitations);
     }

@@ -1,10 +1,9 @@
 <script setup>
-import { ref, inject } from 'vue'
+import { ref, inject, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CommentItem from './CommentItem.vue'
 import AddComment from './AddComment.vue'
 import { useCommentStore } from '@/stores/commentStore'
-import { onUnmounted } from 'vue'
 
 const { t } = useI18n()
 const sharedDay = inject('sharedDay')
@@ -14,13 +13,11 @@ const showComments = ref(false)
 const toggleComments = () => {
     showComments.value = !showComments.value
     if (showComments.value && commentStore.comments.length === 0) {
-        commentStore.fetch(sharedDay.value.channel_id, sharedDay.value.id)
+        commentStore.fetch(sharedDay.value.id)
     }
 }
 
-onUnmounted(() => {
-    commentStore.reset()
-})
+onUnmounted(() => commentStore.reset())
 </script>
 
 <template>
@@ -52,7 +49,7 @@ onUnmounted(() => {
 
                 <button
                     v-if="commentStore.hasMore"
-                    @click="commentStore.loadMore(sharedDay.channel_id, sharedDay.id)"
+                    @click="commentStore.loadMore(sharedDay.value.id)"
                     :disabled="commentStore.loading"
                     class="w-full py-4 text-[11px] font-black uppercase tracking-[0.2em] text-[#A0A0A0] hover:text-[#5A7D5A] disabled:opacity-50 transition-colors bg-[#F9F7F2] rounded-2xl">
                     {{ commentStore.loading ? '...' : t('comments.load_more') }}
@@ -67,8 +64,7 @@ onUnmounted(() => {
                 </p>
             </div>
 
-            <div v-if="commentStore.loading && commentStore.comments.length === 0"
-                class="space-y-4">
+            <div v-if="commentStore.loading && commentStore.comments.length === 0" class="space-y-4">
                 <div v-for="i in 3" :key="i" class="h-20 bg-[#F9F7F2] rounded-[2rem] animate-pulse"></div>
             </div>
 

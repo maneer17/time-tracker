@@ -2,8 +2,8 @@
 import { inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
-import { useRouter } from 'vue-router'
-import useApi from '@/composables/useApi'
+import { usePagination } from '@/composables/usePagination'
+import AppPagination from '@/components/AppPagination.vue'
 import sharedDayService from '@/services/sharedDayService'
 import SharedDayCard from './SharedDayCard.vue'
 
@@ -11,13 +11,15 @@ const { t } = useI18n()
 const toast = useToast()
 const channel = inject('channel')
 
-const { data, error,request } = useApi(
-    () => sharedDayService.getChannelSharedDays(channel.value.id), true
+
+const { items: data, paginatorData, loading, error, goToPage, refresh } = usePagination(
+    (page) => sharedDayService.getChannelSharedDays(channel.value.id,{ page }),
+    { immediate: true }
 )
 
 const refreshPage = () => {
     toast.success(t('channel_shared_days.removed'))
-    request()
+    refresh()
 }
 </script>
 
@@ -37,6 +39,10 @@ const refreshPage = () => {
                     :day="sharedDay"
                     @deleted="refreshPage" />
             </div>
+            <AppPagination 
+                v-if="paginatorData?.meta" 
+                :data="paginatorData" 
+                @page-change="goToPage" />
 
             <div v-else class="flex flex-col items-center justify-center py-20 bg-gray-50/50 border-2 border-dashed border-gray-200 rounded-3xl">
                 <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-2xl mb-4">📅</div>

@@ -16,7 +16,7 @@ class SharedDayController extends Controller
         $this->authorize('viewAny', $channel);
 
         return SharedDayResource::collection(
-            $channel->sharedDays()->get()
+            $channel->sharedDays()->paginate($this->paginate)
         );
     }
 

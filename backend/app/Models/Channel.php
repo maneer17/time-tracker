@@ -11,7 +11,6 @@ class Channel extends Model
     use HasFactory;
 
     protected $fillable = ['user_id', 'name', 'description'];
-    protected $appends = ['members_count'];
 
     public function owner(): BelongsTo
     {
@@ -32,12 +31,6 @@ class Channel extends Model
     public function sharedDays(): HasMany
     {
         return $this->hasMany(SharedDay::class);
-    }
-    protected function membersCount(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->members()->count()
-        );
     }
 
     public function scopeOwned(Builder $query, User $user): Builder{

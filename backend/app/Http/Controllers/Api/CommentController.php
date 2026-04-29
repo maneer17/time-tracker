@@ -9,21 +9,21 @@ use App\Models\{Channel, Comment, SharedDay};
 
 class CommentController extends Controller
 {
-    public function index(Channel $channel, SharedDay $sharedDay)
+    public function index(SharedDay $sharedDay)
     {
-        $this->authorize('viewAny', [Comment::class, $channel]);
+        $this->authorize('viewAny', [Comment::class, $sharedDay->channel]);
 
         return CommentResource::collection(
             $sharedDay->comments()
                 ->with(['author', 'sharedDay.channel'])
                 ->latest()
-                ->paginate(1)
+                ->paginate($this->paginate)
         );
     }
 
-    public function store(StoreCommentRequest $request, Channel $channel, SharedDay $sharedDay)
+    public function store(StoreCommentRequest $request, SharedDay $sharedDay)
     {
-        $this->authorize('create', [Comment::class, $channel]);
+        $this->authorize('create', [Comment::class, $sharedDay->channel]);
 
         $comment = $sharedDay->comments()->create([
             ...$request->validated(),
@@ -33,7 +33,7 @@ class CommentController extends Controller
         return new CommentResource($comment->load(['author', 'sharedDay.channel']));
     }
 
-    public function update(UpdateCommentRequest $request, Channel $channel, SharedDay $sharedDay, Comment $comment)
+    public function update(UpdateCommentRequest $request, SharedDay $sharedDay, Comment $comment)
     {
         $this->authorize('update', $comment);
 
@@ -42,12 +42,13 @@ class CommentController extends Controller
         return new CommentResource($comment->load(['author', 'sharedDay.channel']));
     }
 
-    public function destroy(Channel $channel, SharedDay $sharedDay, Comment $comment)
+    public function destroy(SharedDay $sharedDay, Comment $comment)
     {
-        $this->authorize('delete', [$comment, $channel]);
+        $this->authorize('delete', [$comment, $sharedDay->channel]);
 
         $comment->delete();
 
         return new CommentResource($comment);
     }
+
 }

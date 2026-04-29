@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use \App\Models\User ;
-use \App\Models\Channel;
+use \App\Models\{Channel, User};
 return new class extends Migration
 {
     /**
@@ -14,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('members', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Channel::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
