@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import GoogleLogin from '@/components/GoogleLogin.vue';
 const registerForm = ref({
   email: '',
   name: '',
@@ -137,6 +138,7 @@ const handleSubmit = async () => {
             </router-link>
           </p>
         </form>
+        <GoogleLogin />
       </div>
     </div>
   </div>

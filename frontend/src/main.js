@@ -8,6 +8,7 @@ import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import en from './locales/en.json'
 import ar from './locales/ar.json'
+import vue3GoogleLogin from 'vue3-google-login'
 
 const app = createApp(App)
 
@@ -22,4 +23,7 @@ app.use(createPinia())
 app.use(router)
 app.use(Toast)
 app.use(i18n)
+app.use(vue3GoogleLogin, {
+  clientId: '790034353136-fdm5vgcqgmjsh6lcp4igrc4khenihdes.apps.googleusercontent.com'
+})
 app.mount('#app')
