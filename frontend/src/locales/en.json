@@ -1,0 +1,226 @@
+{
+    "message": {
+        "hello": "hello"
+    },
+    "login": {
+        "welcome_back": "Welcome Back",
+        "email": "Email",
+        "password": "Password",
+        "login": "Login",
+        "dont_have_account": "Don't have an account?",
+        "sign_up_here": "Sign Up Here"
+    },
+    "register": {
+        "create_account": "Create Account",
+        "name": "Name",
+        "email": "Email",
+        "password": "Password",
+        "confirm_password": "Confirm Password",
+        "sign_up": "Sign Up",
+        "you_already_have_account": "You already have an account? ",
+        "login": "Login"
+    },
+    "about": {
+        "title": "About",
+        "p1": "TimeTracker is a personal productivity tool that helps you log and understand how you spend your time every day. Simply add time entries with a label, start time, and end time — and the app takes care of the rest.",
+        "p2": "You can share your daily activity logs with channels — groups of people you collaborate with. Channel members can view your shared days, see your time entries, and leave comments. It's a simple way to stay transparent with your team without the overhead of complex project management tools.",
+        "p3": "The reports feature gives you a clear picture of where your time goes. Select any date range and instantly see breakdowns by label, your most used activity types, and daily averages — all visualized with charts to make patterns easy to spot."
+    },
+
+    "nav": {
+        "home": "Home",
+        "about": "About",
+        "add": "Add Entry",
+        "sign_out": "Sign Out",
+        "channels": "Channels",
+        "shared_days": "Shared Days",
+        "reports": "Reports",
+        "invitations": "Invitations"
+    },
+    "addForm": {
+        "label": "Label",
+        "start_time": "Start Time",
+        "end_time": "End Time",
+        "add_entry": "Add Entry"
+    },
+    "home": {
+        "history": "History",
+        "hide": "Hide",
+        "total_time": "Total Time",
+        "total_entries": "Entries",
+        "avg_per_entry": "Avg per Entry",
+        "load_more": "Load more",
+        "add_new_entry": "Add New Entry",
+        "today_entries": "Today's Entries",
+        "entries_of": "Time Entries of",
+        "error": "Oops! Error encountered",
+        "loading": "Loading entries...",
+        "error_loading_dates": "Error loading dates",
+        "no_dates": "No dates available",
+        "search_placeholder": "Search...",
+        "sort_default": "Default",
+        "sort_oldest": "Oldest",
+        "sort_latest": "Latest"
+    },
+    "single_entry": {
+        "hour": "0 hours | {n} hour | {n} hours",
+        "minute": "0 minutes | {n} minute | {n} minutes",
+        "confirm_delete": "Are you sure?",
+        "yes": "Yes",
+        "no": "No"
+    },
+    "update": {
+    "label": "Label",
+    "start_time": "Start Time",
+    "end_time": "End Time",
+    "loading": "Updating...",
+    "update": "Update",
+    "save_changes": "Save Changes",
+    "cancel": "Cancel"
+  },
+    "channel_list": {
+        "title": "Channels",
+        "new_channel": "New Channel",
+        "my_channels": "My Channels",
+        "member_of": "Member Of",
+        "no_owned": "You have no channels yet.",
+        "no_joined": "You are not a member of any channel yet.",
+        "loading": "Loading...",
+        "error": "Something went wrong",
+        "delete_confirm": "Are you sure you want to delete this channel?",
+        "create_first": "Create your first channel"
+    },
+    "create_channel": {
+        "title": "Create Channel",
+        "name": "Name",
+        "description": "Description",
+        "submit": "Create Channel",
+        "loading": "Loading..."
+    },
+    "channel": {
+        "overview": "Overview",
+        "members": "Members",
+        "shared_days": "Shared Days",
+        "settings": "Settings",
+        "coming_soon": "Coming soon...",
+        "delete_channel": "Delete Channel",
+        "delete_warning": "This action is permanent and cannot be undone.",
+        "delete_confirm": "Are you sure you want to delete this channel?",
+        "yes": "Yes, delete",
+        "no": "Cancel",
+        "loading": "Loading...",
+        "error": "Something went wrong"
+    },
+    "channel_members": {
+        "community": "Community",
+        "manage_members": "Manage your channel members and outgoing invites.",
+        "active_members": "Active Members",
+        "pending_invitations": "Pending Invitations",
+        "invite_member": "Invite Member",
+        "no_pending": "No pending invitations."
+    },
+    "invite_modal": {
+        "title": "Invite to Channel",
+        "search_placeholder": "Search by name or email",
+        "cancel": "Cancel",
+        "send": "Send Invitation",
+        "sending": "Sending..."
+    },
+    "channel_overview": {
+        "created": "Created",
+        "members": "Members",
+        "no_description": "No description provided for this channel."
+    },
+    "channel_card": {
+        "no_description": "No description provided for this channel.",
+        "members": "members",
+        "enter": "Enter"
+    },
+    "invitation_card": {
+        "cancel": "Cancel",
+        "accept": "Accept",
+        "decline": "Decline"
+    },
+    "invitations_view": {
+        "title": "My Invitations",
+        "empty": "You haven't received any invitations yet.",
+        "loading": "Loading...",
+        "error": "Something went wrong"
+    },
+    "share_day": {
+        "title": "Share Activity",
+        "entries_title": "Select Time Entries to Share",
+        "channels_title": "Share To Channels",
+        "loading_entries": "Loading entries...",
+        "loading_channels": "Loading channels...",
+        "error_entries": "Failed to load time entries. Please try again.",
+        "error_channels": "Failed to load channels. Please try again.",
+        "no_entries": "No time entries found for this day.",
+        "no_channels": "You don't own any channels yet.",
+        "members": "members",
+        "sharing": "Sharing...",
+        "submit": "Share Day",
+        "selected": "selected",
+        "ready": "Ready to share?",
+        "summary": "{entries} logs to {channels} channels"
+    },
+    "shared_day_card": {
+        "day": "Day",
+        "entries": "entries"
+    },
+    "my_shared_days": {
+        "title": "My Shared Days",
+        "shared_to": "Shared to {count} channel | Shared to {count} channels",
+        "empty_title": "No shared days yet",
+        "empty_message": "Go to your history and share a day to a channel."
+    },
+    "channel_shared_days": {
+        "removed": "Day removed successfully!",
+        "empty_title": "No shared days yet",
+        "empty_message": "Shared logs will appear here once members post them."
+    },
+    "shared_day_view": {
+        "summary": "Activity Log Summary",
+        "total_time": "Total Time"
+    },
+    "history_date_item": {
+        "share": "Share"
+    },
+    
+    "comments": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "placeholder": "Write a comment...",
+        "submit": "Post",
+        "submitting": "Posting...",
+        "title": "Comments",
+        "empty": "No comments yet. Be the first to comment!",
+        "load_more": "Load more",
+        "show": "Show Comments",
+        "hide": "Hide Comments"
+    
+},
+"reports": {
+    "title": "Channel Insights",
+    "subtitle": "Detailed overview of your workspace activity.",
+    "refresh": "Refresh",
+    "generate": "Generate Report",
+    "generating": "Generating...",
+    "from": "From",
+    "to": "To",
+    "empty_state": "No entries found",
+    "empty_hint": "Try selecting a different date range.",
+    "quick_stats": {
+      "title": "Quick Stats",
+      "total_entries": "Total Entries",
+      "total_time": "Total Time",
+      "daily_avg": "Daily Average",
+      "labels_per_day": "labels per day"
+    },
+    "charts": {
+      "time_distribution": "Time Distribution",
+      "most_used": "Most Used Labels",
+      "avg_per_label": "Average Time per Label"
+    }
+  }
+}

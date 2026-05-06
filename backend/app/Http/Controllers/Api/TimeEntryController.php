@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api; 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreTimeEntryRequest; 
-use App\Http\Requests\UpdateTimeEntryRequest; 
+namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
-use App\Http\Resources\TimeEntryResource;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\{StoreTimeEntryRequest, UpdateTimeEntryRequest};
+use App\Http\Resources\{DateResource, TimeEntryResource};
 use App\Models\TimeEntry;
 
 class TimeEntryController extends Controller
@@ -13,22 +12,24 @@ class TimeEntryController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['date', 'sort', 'search', 'history']);
-        if ($request->boolean('history')) {
-            $dates = auth()->user()
-                ->time_entries()
-                ->history()
-                ->pluck('date');
 
-            return response()->json($dates);
-        }
+    if ($request->boolean('history')) {
+        $dates = auth()->user()
+            ->time_entries()
+            ->history()
+            ->paginate($this->paginate);
 
+        return DateResource::collection($dates);
+    }
+        // created an entirly new resource to handle the history to keep the pagination structure consistent throughout the app
         $time_entries = auth()->user()
             ->time_entries()
             ->search($filters)
-            ->paginate(15);
+            ->paginate($this->paginate);
 
         return TimeEntryResource::collection($time_entries);
     }
+
 
     public function store(StoreTimeEntryRequest $request)
     {
