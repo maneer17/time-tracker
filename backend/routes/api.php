@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\{
     UserController,
     CommentController,
     MeController,
+    PasswordController,
     ReportController
 };
 
@@ -20,8 +21,15 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/auth/google', 'google');
 });
 
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::prefix('passwords')->group(function (){
+    Route::post('forgot-password', [PasswordController::class, 'forgotPassword']);
+    Route::post('reset-password', [PasswordController::class, 'resetPassword']);
+
 });
 
 Route::middleware('auth:sanctum')->group(function () {

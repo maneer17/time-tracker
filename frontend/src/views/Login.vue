@@ -107,6 +107,14 @@ const handleSubmit = async () => {
           </p>
         </form>
         <GoogleLogin />
+        <p>
+          <router-link
+          :to="{name: 'ForgotPassword'}"
+          class="text-[#D4A373] hover:text-[#5A7D5A] transition-colors ml-1 underline decoration-2 underline-offset-4"
+          >
+          {{ $t('login.forgot_password') }}
+          </router-link>
+        </p>
       </div>
     </div>
   </div>

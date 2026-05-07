@@ -8,7 +8,8 @@
         "password": "Password",
         "login": "Login",
         "dont_have_account": "Don't have an account?",
-        "sign_up_here": "Sign Up Here"
+        "sign_up_here": "Sign Up Here",
+        "forgot_password": "Forgot your Password?"
     },
     "register": {
         "create_account": "Create Account",
@@ -222,5 +223,28 @@
       "most_used": "Most Used Labels",
       "avg_per_label": "Average Time per Label"
     }
-  }
+  },
+    "passwords": {
+        "forgotPassword": {
+            "resetPassword": "Reset Password",
+            "enterEmail": "Enter your email to receive a recovery link",
+            "emailAddress": "Email Address",
+            "emailPlaceholder": "name@company.com",
+            "sendResetLink": "Send reset link",
+            "checkEmail": "Check your email",
+            "didntReceive": "Didn't receive it? Check your spam folder or",
+            "tryAgain": "try again"
+        },
+        "resetPassword": {
+            "setNewPassword": "Set New Password",
+            "enterNewPassword": "Enter your new password below",
+            "newPassword": "New Password",
+            "newPasswordPlaceholder": "Enter new password",
+            "confirmPassword": "Confirm Password",
+            "confirmPasswordPlaceholder": "Confirm new password",
+            "resetPasswordButton": "Reset Password",
+            "passwordReset": "Password Reset!",
+            "redirecting": "Redirecting you to login..."
+        }
+    }
 }

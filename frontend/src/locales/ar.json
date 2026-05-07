@@ -10,7 +10,8 @@
         "password": "كلمة المرور",
         "login": "تسجيل الدخول",
         "dont_have_account": "لا تملك حساب ؟",
-        "sign_up_here": "أنشئ حساب هنا"
+        "sign_up_here": "أنشئ حساب هنا",
+        "forgot_password": "هل نسيت كلمة السر؟"
     },
     "register": {
         "create_account": "أنشئ حساب",
@@ -223,5 +224,28 @@
       "most_used": "التصنيفات الأكثر استخداماً",
       "avg_per_label": "متوسط الوقت لكل تصنيف"
     }
-  }
+  },
+    "passwords": {
+        "forgotPassword": {
+            "resetPassword": "إعادة تعيين كلمة المرور",
+            "enterEmail": "أدخل بريدك الإلكتروني لاستلام رابط الاسترداد",
+            "emailAddress": "البريد الإلكتروني",
+            "emailPlaceholder": "name@company.com",
+            "sendResetLink": "إرسال رابط إعادة التعيين",
+            "checkEmail": "تحقق من بريدك الإلكتروني",
+            "didntReceive": "لم تستلم الرسالة؟ تحقق من مجلد الرسائل غير المرغوب فيها أو",
+            "tryAgain": "حاول مجدداً"
+        },
+        "resetPassword": {
+            "setNewPassword": "تعيين كلمة مرور جديدة",
+            "enterNewPassword": "أدخل كلمة المرور الجديدة أدناه",
+            "newPassword": "كلمة المرور الجديدة",
+            "newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
+            "confirmPassword": "تأكيد كلمة المرور",
+            "confirmPasswordPlaceholder": "أكد كلمة المرور الجديدة",
+            "resetPasswordButton": "إعادة تعيين كلمة المرور",
+            "passwordReset": "تمت إعادة تعيين كلمة المرور!",
+            "redirecting": "جاري تحويلك إلى صفحة تسجيل الدخول..."
+        }
+    }
 }

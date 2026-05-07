@@ -1,12 +1,14 @@
 import { useToast } from 'vue-toastification';
 import ERROR_MESSAGES from '../config/customErrors';
+import { i18n } from '@/plugins/i18n';
 const toast = useToast();
 import axios from 'axios';
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    'Accept-Language': i18n.global.locale.value
   }
 });
 
@@ -16,6 +18,7 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    config.headers['Accept-Language'] = i18n.global.locale.value
     return config;
   },
   (error) => {
