@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ForgotPasswordRequest;
-use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\{ForgotPasswordRequest, ResetPasswordRequest};
 use Illuminate\Support\Facades\Password;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
