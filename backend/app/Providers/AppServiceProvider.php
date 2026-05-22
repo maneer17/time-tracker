@@ -3,10 +3,11 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Models\Invitation;
-use App\Models\TimeEntry;
+use App\Models\{Invitation, TimeEntry, User};
 use App\Observers\InvitationObserver;
 use App\Observers\TimeEntryObserver;
+use App\Observers\UserObserver;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -24,5 +25,6 @@ class AppServiceProvider extends ServiceProvider
     {
         TimeEntry::observe(TimeEntryObserver::class);
         Invitation::observe(InvitationObserver::class);
+        User::observe(UserObserver::class);
     }
 }

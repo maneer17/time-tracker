@@ -5,8 +5,8 @@ namespace App\Providers;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
-
+use \App\Events\{InvitationSent, AcceptedInvitationEvent, NewCommentEvent, NewSharedDayEvent, CommentDeletedByOwnerEvent};
+use \App\Listeners\{NewInvitationListener, AcceptedInvitationListener, NewCommentListener, NewSharedDayListener, CommentDeletedByOwnerListener};
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -19,9 +19,23 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         \SocialiteProviders\Manager\SocialiteWasCalled::class => [
-        // ... other providers
-        \SocialiteProviders\Google\GoogleExtendSocialite::class.'@handle',
-    ],
+            \SocialiteProviders\Google\GoogleExtendSocialite::class.'@handle',
+        ],
+        InvitationSent::class => [
+            NewInvitationListener::class,
+        ],
+        AcceptedInvitationEvent::class => [
+            AcceptedInvitationListener::class,
+        ],
+        NewCommentEvent::class => [
+            NewCommentListener::class,
+        ],
+        NewSharedDayEvent::class => [
+            NewSharedDayListener::class,
+        ],
+        CommentDeletedByOwnerEvent::class => [
+            CommentDeletedByOwnerListener::class,
+        ],
     ];
 
     /**

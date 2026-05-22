@@ -37,8 +37,18 @@
         "channels": "القنوات",
         "shared_days": "الأيام المشتركة",
         "reports": "التقارير",
-        "invitations": "الدعوات"
+        "invitations": "الدعوات",
+        "settings": "الإعدادات"
     },
+    "settings": {
+    "emailNotifications": {
+        "title": "إشعارات البريد الإلكتروني",
+        "description": "اختر الإشعارات التي تريد استلامها",
+        "saveButton": "حفظ التغييرات",
+        "saving": "جاري الحفظ...",
+        "fetchError": "فشل تحميل التفضيلات. يرجى المحاولة مجدداً."
+    }
+},
     "addForm": {
         "label": "العنوان",
         "start_time": "وقت البدء",

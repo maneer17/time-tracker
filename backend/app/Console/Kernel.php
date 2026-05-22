@@ -14,6 +14,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         Schedule::command('auth:clear-resets')->daily();
+        Schedule::command('notifications:prune', ['--days=30'])->daily();
+        Schedule::command('queue:prune-failed', ['--hours=168'])->weekly();
     }
 
     /**

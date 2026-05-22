@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\InvitationSent;
 use App\Models\Channel;
 use App\Models\Invitation;
 use App\Models\User;
@@ -77,5 +78,6 @@ class InviteService
             'invited_by_id' => $channel->user_id,
             'status'        => 'pending',
         ]);
+        
     }
 }

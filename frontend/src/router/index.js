@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
 import AddForm from '@/views/AddForm.vue'
+import NotificationsList from '@/views/NotificationsList.vue'
 import { authGaurd } from '@/middleware/auth'
 import CreateChannelForm from '@/views/CreateChannelForm.vue'
 import ChannelDashboard from '@/views/ChannelDashboard.vue'
@@ -14,6 +15,7 @@ import MySharedDays from '@/views/MySharedDays.vue'
 import ReportsView from '@/views/ReportsView.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
 import ForgotPassword from '@/views/ForgotPassword.vue'
+import Settings from '@/views/Settings.vue'
 
 
 const router = createRouter({
@@ -30,6 +32,13 @@ const router = createRouter({
       name: "About",
       component: About,
       meta: { requiresAuth: true }
+    },
+    {
+      path: "/settings",
+      name: "Settings",
+      component: Settings,
+      meta: {requiresAuth: true}
+
     },
     {
       path: "/add-entry",
@@ -99,7 +108,13 @@ const router = createRouter({
       path: "/reset-password",
       name: "ResetPassword",
       component: ResetPassword
-    }
+    },
+    {
+    path: '/notifications',
+    name: 'Notifications',
+    component:NotificationsList,
+    meta: { requiresAuth: true }
+}
   ],
 })
 

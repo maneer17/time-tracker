@@ -36,7 +36,9 @@
         "channels": "Channels",
         "shared_days": "Shared Days",
         "reports": "Reports",
-        "invitations": "Invitations"
+        "invitations": "Invitations",
+        "settings": "Settings"
+
     },
     "addForm": {
         "label": "Label",
@@ -224,6 +226,15 @@
       "avg_per_label": "Average Time per Label"
     }
   },
+  "settings": {
+    "emailNotifications": {
+        "title": "Email Notifications",
+        "description": "Choose which emails you want to receive",
+        "saveButton": "Save changes",
+        "saving": "Saving...",
+        "fetchError": "Failed to load preferences. Please try again."
+    }
+},
     "passwords": {
         "forgotPassword": {
             "resetPassword": "Reset Password",

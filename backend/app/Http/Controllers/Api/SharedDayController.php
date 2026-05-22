@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\NewSharedDayEvent;
 use App\Models\{Channel, SharedDay};
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSharedDayRequest;
@@ -51,6 +52,7 @@ class SharedDayController extends Controller
                 }
 
                 $sharedDay->load(['entries.timeEntry', 'channel']);
+                event(new NewSharedDayEvent($sharedDay));
                 $sharedDays->push($sharedDay);
             }
         });

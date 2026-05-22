@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\{NewCommentEvent, CommentDeletedByOwnerEvent};
 use App\Http\Resources\CommentResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{StoreCommentRequest, UpdateCommentRequest};
 use App\Models\{Channel, Comment, SharedDay};
-
 class CommentController extends Controller
 {
     public function index(SharedDay $sharedDay)
@@ -29,8 +29,10 @@ class CommentController extends Controller
             ...$request->validated(),
             'user_id' => auth()->id()
         ]);
-
-        return new CommentResource($comment->load(['author', 'sharedDay.channel']));
+        $comment = $comment->load(['author', 'sharedDay.channel']);
+        event(new NewCommentEvent($comment));
+        return new CommentResource($comment);
+        
     }
 
     public function update(UpdateCommentRequest $request, SharedDay $sharedDay, Comment $comment)
@@ -46,8 +48,14 @@ class CommentController extends Controller
     {
         $this->authorize('delete', [$comment, $sharedDay->channel]);
 
-        $comment->delete();
+        // ✅ load relations and fire event BEFORE deleting
+        $comment->load(['author', 'sharedDay.channel']);
 
+        if ($comment->sharedDay->channel->isOwner(auth()->user())) {
+            event(new CommentDeletedByOwnerEvent($comment));
+        }
+
+        $comment->delete();
         return new CommentResource($comment);
     }
 

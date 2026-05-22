@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Models\{Channel, Invitation, User};
+use App\Events\InvitationSent;
+use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{StoreInvitationRequest, UpdateInvitationRequest};
 use App\Http\Resources\InvitationResource;
@@ -31,6 +33,7 @@ class InvitationController extends Controller
         $validated = $request->validated();
         $identifier = $validated['identifier'];
         $invitation = $service->invite($identifier, $channel);
+        event(new InvitationSent($invitation)); 
         return new InvitationResource($invitation);
     }
 
@@ -48,5 +51,25 @@ class InvitationController extends Controller
         $service->changeStatus($invitation, $status, auth()->user());
         return new InvitationResource($invitation);
     }
+
+    public function accept(Request $request, Invitation $invitation, InvitationStatusService $service)
+        {
+            try {
+                $service->accept($invitation, $invitation->invitedUser);
+                return redirect(config('app.frontend_url') . '/my-channels');
+            } catch (DomainException $e) {
+                return redirect(config('app.frontend_url') . '/my-invitations?error=' . urlencode($e->getMessage()));
+            }
+        }
+
+        public function deny(Request $request, Invitation $invitation, InvitationStatusService $service)
+        {
+            try {
+                $service->decline($invitation, $invitation->invitedUser);
+                return redirect(config('app.frontend_url') . '/my-invitations');
+            } catch (DomainException $e) {
+                return redirect(config('app.frontend_url') . '/my-invitations?error=' . urlencode($e->getMessage()));
+            }
+        }
 
 }

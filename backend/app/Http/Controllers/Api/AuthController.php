@@ -8,24 +8,26 @@ use App\Models\User;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\{StoreUserRequest, GoogleRequest}; 
 use Illuminate\Support\Facades\Hash;
-use Laravel\Socialite\Socialite;
+use Laravel\Socialite\Facades\Socialite;
 
 
 class AuthController extends Controller
 {
     public function store(StoreUserRequest $request)
-{
-    $validated = $request->validated();
+    {
+        $validated = $request->validated();
 
-    $user = User::create($validated);
+        // password is plain here — the 'hashed' cast on the model handles bcrypt automatically
+        $user = User::create($validated);
 
-    $token = $user->createToken('api-token')->plainTextToken;
+        $token = $user->createToken('api-token')->plainTextToken;
 
-    return response()->json([
-        'token' => $token,
-        'user' => $user
-    ]);
-}
+        return response()->json([
+            'token' => $token,
+            'user' => $user
+        ]);
+    }
+
     public function login(Request $request){
         $request->validate([
             "email"=>"required|email",
@@ -37,6 +39,14 @@ class AuthController extends Controller
                 "email"=> ["incorrect credentials"],
             ]);
         }
+
+        // guard against Google-only accounts — they have no usable password
+        if(is_null($user->password)){
+            throw ValidationException::withMessages([
+                "email"=> ["This account uses Google Sign-In. Please login with Google."],
+            ]);
+        }
+
         if(!Hash::check($request->password, $user->password)){
             throw ValidationException::withMessages(
                 [
@@ -58,9 +68,6 @@ class AuthController extends Controller
     }
 
 
-
-
-
     public function google(GoogleRequest $request)
     {
         $token = $request->validated()['token'];
@@ -73,17 +80,17 @@ class AuthController extends Controller
                 ->userFromToken($token);
 
         } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Invalid Google token',
-        ], 401);
-    }
+            return response()->json([
+                'message' => 'Invalid Google token',
+            ], 401);
+        }
 
         $user = User::firstOrCreate(
             ['email' => $googleUser->getEmail()],
             [
                 'name'              => $googleUser->getName(),
                 'google_id'         => $googleUser->getId(),
-                'password'          => null,
+                'password'          => null, 
                 'email_verified_at' => now(),
             ]
         );

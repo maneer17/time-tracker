@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\AcceptedInvitationEvent;
 use App\Models\Invitation;
 use App\Models\Member;
 use App\Models\User;
@@ -37,6 +38,7 @@ class InvitationStatusService
                 'channel_id' => $invitation->channel_id,
             ]);
         });
+        event(new AcceptedInvitationEvent($invitation));
     }
 
     public function decline(Invitation $invitation, User $actor): void

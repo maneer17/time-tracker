@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -41,6 +42,12 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+
+    public function notificationTypes() :HasMany
+    {
+        return $this->hasMany(NotificationsTypes::class);
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -49,6 +56,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'password',
+        'google_id',
+        'email_verified_at'
     ];
 
     /**

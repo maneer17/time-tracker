@@ -3,7 +3,6 @@ import NavBar from './components/NavBar.vue';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
 import { onMounted, watch, computed } from 'vue';
-
 const { t, locale } = useI18n({ useScope: 'global' })
 const authStore = useAuthStore();
 
