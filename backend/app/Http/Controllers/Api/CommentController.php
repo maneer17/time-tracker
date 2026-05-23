@@ -48,7 +48,6 @@ class CommentController extends Controller
     {
         $this->authorize('delete', [$comment, $sharedDay->channel]);
 
-        // ✅ load relations and fire event BEFORE deleting
         $comment->load(['author', 'sharedDay.channel']);
 
         if ($comment->sharedDay->channel->isOwner(auth()->user())) {

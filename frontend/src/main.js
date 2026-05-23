@@ -4,7 +4,6 @@ import App from './App.vue'
 import router from './router'
 import './assets/main.css'
 import Toast from 'vue-toastification'
-import PrimeVue from 'primevue/config';
 import 'vue-toastification/dist/index.css'
 import vue3GoogleLogin from 'vue3-google-login'
 import { i18n } from './plugins/i18n'
@@ -22,7 +21,7 @@ window.Echo = new Echo({
     enabledTransports: ['ws', 'wss'],
     authorizer: (channel) => ({
         authorize: (socketId, callback) => {
-            apiClient.post('/broadcasting/auth', {
+            apiClient.post('api/broadcasting/auth', {
                 socket_id: socketId,
                 channel_name: channel.name,
             })
@@ -39,5 +38,4 @@ app.use(i18n)
 app.use(vue3GoogleLogin, {
   clientId: import.meta.env.VITE_CLIENT_ID
 })
-app.use(PrimeVue);
 app.mount('#app')

@@ -12,7 +12,9 @@ class BroadcastServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Broadcast::routes(['middleware' => ['auth:sanctum']]);
+        Broadcast::routes(['middleware' => ['auth:sanctum'],
+        'prefix'     => 'api',
+        ]);
         // Broadcast::routes(); uses web middlware by default therefore uses session auth not token
         require base_path('routes/channels.php');
     }
