@@ -13,6 +13,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
+        Schedule::command('auth:clear-resets')->daily()->onOneServer();
+        Schedule::command('notifications:prune', ['--days=30'])->daily()->onOneServer();
+        Schedule::command('queue:prune-failed', ['--hours=168'])->weekly()->onOneServer();
+        // ensure task run on one server
     }
 
     /**

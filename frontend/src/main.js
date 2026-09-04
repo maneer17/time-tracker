@@ -1,134 +1,41 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
 import './assets/main.css'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+import vue3GoogleLogin from 'vue3-google-login'
+import { i18n } from './plugins/i18n'
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+import apiClient from './services/api'
+window.Pusher = Pusher;
+window.Echo = new Echo({
+    broadcaster: 'reverb',
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: import.meta.env.VITE_REVERB_PORT,
+    wssPort: import.meta.env.VITE_REVERB_PORT,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    enabledTransports: ['ws', 'wss'],
+    authorizer: (channel) => ({
+        authorize: (socketId, callback) => {
+            apiClient.post('api/broadcasting/auth', {
+                socket_id: socketId,
+                channel_name: channel.name,
+            })
+            .then(res => callback(null, res.data))
+            .catch(err => callback(err))
+        }
+    })
+});
 const app = createApp(App)
-
 app.use(createPinia())
 app.use(router)
 app.use(Toast)
-
-const i18n = createI18n({
-legacy: false,
-  locale: 'ar',
-  fallbackLocale: 'en',
-  messages: {
-    en: {
-      mesasge: {
-        hello: 'hello',
-      },
-      login: {
-        welcome_back: 'Welcome Back',
-        email: 'Email',
-        password: 'Password',
-        login: 'Login',
-        dont_have_account: "Don't have an account?",
-        sign_up_here: "Sign Up Here"
-      },
-      register:{
-        create_account: "Create Account",
-        name: "Name",
-        email: "Email",
-        password: "Password",
-        confirm_password: "Confirm Password",
-        sign_up: "Sign Up",
-        you_already_have_account: "You already have an account? ",
-        login: "Login"
-      },
-      nav: {
-        home: "Home",
-        about: "About",
-        add: "Add a new Time Entry",
-        sign_out: "Sign Out",
-
-      },
-      addForm: {
-        label:"Label",
-        start_time: "Start Time",
-        end_time: "End Time",
-        add_entry: "Add Entry"
-      },
-      home: {
-        history: "History",
-        hide: "Hide",
-        add_new_entry: "Add New Entry",
-        today_entries: "Today's Entries",
-        entries_of: "Time Entries of",
-        error: "Oops! Error encountered",
-        loading: "Loading entries...",
-        error_loading_dates: "Error loading dates",
-        no_dates: "No dates available"
-      },
-      single_entry: {
-        hour: '0 hours | {n} hour | {n} hours',
-          "confirm_delete": "Are you sure?",
-          "yes": "Yes",
-           "no": "No",
-        minute: '0 minutes | {n} minute | {n} minutes'
-      }
-
-    },
-    ar: {
-      message: {
-        hello: "مرحبا",
-        hide_history: 'اخفاء',
-        add_entry: 'أضف نشاط جديد'
-      },
-      login: {
-        welcome_back: 'أهلا بعودتك',
-        email: 'الايميل',
-        password: 'كلمة المرور',
-        login:'تسجيل الدخول',
-        dont_have_account: "لا تملك حساب ؟",
-        sign_up_here: "أنشئ حساب هنا"
-      },
-      register:{
-        create_account: "أنشئ حساب",
-        name: "الاسم",
-        email: "الايميل",
-        password: "كلمة المرور",
-        confirm_password: "تأكيد كلمة المرور",
-        sign_up: "أنشئ حساب",
-        you_already_have_account: "لديك حساب؟",
-        login: "سجل الدخول"
-      },
-      nav: {
-        home: "الصفحة الرئيسية",
-        about: "عن الموقع",
-        add: 'أضف نشاط جديد',
-        sign_out: "تسجيل الخروج",
-        
-      },
-      addForm: {
-        label:"العنوان",
-        start_time: "وقت البدء",
-        end_time: "وقت الانتهاء",
-        add_entry: "أضف النشاط"
-      },
-      home: {
-        history: "السجل",
-        hide: "إخفاء",
-        add_new_entry: "أضف نشاط جديد",
-        today_entries: "نشاطات اليوم",
-        entries_of: "نشاطات",
-        error: "عذراً! حدث خطأ",
-        loading: "جاري التحميل...",
-        error_loading_dates: "خطأ في تحميل التواريخ",
-        no_dates: "لا توجد تواريخ متاحة"
-      },
-      single_entry: {
-        hour: 'صفر  ساعات | {n} ساعة | {n} ساعات',
-        minute: 'صفر دقائق | {n} دقيقة | {n} دقائق',
-          "confirm_delete": "هل أنت متأكد؟",
-          "yes": "نعم",
-          "no": "لا"
-      }      
-    },
-  },
-});
 app.use(i18n)
+app.use(vue3GoogleLogin, {
+  clientId: import.meta.env.VITE_CLIENT_ID
+})
 app.mount('#app')

@@ -1,9 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import useApi from '@/composables/useApi';
 import timeEntryService from '@/services/timeEntryService';
 
+const { t } = useI18n()
 const router = useRouter()
 const formData = ref({
   label: '',
@@ -26,56 +28,78 @@ const submit = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-[#f5f5f5] p-8">
-    <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-[500px]">
+  <div class="min-h-[80vh] flex items-center justify-center p-6">
+    <div class="bg-white rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-10 w-full max-w-[500px] border border-white">
       
-      <div class="mb-6">
-        <h2 class="m-0 text-[#333] text-2xl font-semibold">{{ $t('addForm.add_entry') }}</h2>
+      <div class="mb-10 text-center">
+        <h2 class="text-3xl font-black text-[#333] tracking-tight">{{ t('addForm.add_entry') }}</h2>
+        <p class="text-[#A0A0A0] text-sm mt-2 font-medium">Log your activity for today</p>
       </div>
 
-      <form @submit.prevent="submit" class="max-w-[500px]">
-        <div class="mb-5">
-          <label class="block mb-1.5 text-[#555] text-[0.9rem] font-medium">{{ $t("addForm.label") }}</label>
+      <form @submit.prevent="submit" class="space-y-6">
+        <div>
+          <label class="block mb-2 text-xs font-bold text-[#A0A0A0] uppercase tracking-widest px-1">
+            {{ t("addForm.label") }}
+          </label>
           <input 
             type="text" 
             v-model="formData.label" 
             required
-            class="w-full px-2.5 py-2 border border-[#ddd] rounded text-[0.95rem] transition-colors duration-200 box-border focus:outline-none focus:border-[#007bff]"
+            placeholder="What are you working on?"
+            class="w-full px-6 py-4 bg-[#F9F7F2] border-2 border-transparent rounded-[1.5rem] text-[1rem] transition-all focus:outline-none focus:border-[#D4E2D4] focus:bg-white"
           >
-          <span v-if="error?.label" class="block mt-1 text-[#cc3333] text-[0.85rem]">{{ error.label[0] }}</span>
+          <span v-if="error?.label" class="block mt-2 px-4 text-[#AF4E4E] text-xs font-bold">{{ error.label[0] }}</span>
         </div>
 
-        <div class="mb-5">
-          <label class="block mb-1.5 text-[#555] text-[0.9rem] font-medium">{{ $t("addForm.start_time") }}</label>
-          <input 
-            type="time" 
-            v-model="formData.startTime" 
-            required
-            class="w-full px-2.5 py-2 border border-[#ddd] rounded text-[0.95rem] transition-colors duration-200 box-border focus:outline-none focus:border-[#007bff]"
-          >
-          <span v-if="error?.start_time" class="block mt-1 text-[#cc3333] text-[0.85rem]">{{ error.start_time[0] }}</span>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-2 text-xs font-bold text-[#A0A0A0] uppercase tracking-widest px-1">
+              {{ t("addForm.start_time") }}
+            </label>
+            <input 
+              type="time" 
+              v-model="formData.startTime" 
+              required
+              class="w-full px-6 py-4 bg-[#F9F7F2] border-2 border-transparent rounded-[1.5rem] text-[1rem] transition-all focus:outline-none focus:border-[#D4E2D4] focus:bg-white"
+            >
+            <span v-if="error?.start_time" class="block mt-2 px-4 text-[#AF4E4E] text-xs font-bold">{{ error.start_time[0] }}</span>
+          </div>
+
+          <div>
+            <label class="block mb-2 text-xs font-bold text-[#A0A0A0] uppercase tracking-widest px-1">
+              {{ t("addForm.end_time") }}
+            </label>
+            <input 
+              type="time" 
+              v-model="formData.endTime" 
+              required
+              class="w-full px-6 py-4 bg-[#F9F7F2] border-2 border-transparent rounded-[1.5rem] text-[1rem] transition-all focus:outline-none focus:border-[#D4E2D4] focus:bg-white"
+            >
+            <span v-if="error?.end_time" class="block mt-2 px-4 text-[#AF4E4E] text-xs font-bold">{{ error.end_time[0] }}</span>
+          </div>
         </div>
 
-        <div class="mb-5">
-          <label class="block mb-1.5 text-[#555] text-[0.9rem] font-medium">{{ $t("addForm.end_time") }}</label>
-          <input 
-            type="time" 
-            v-model="formData.endTime" 
-            required
-            class="w-full px-2.5 py-2 border border-[#ddd] rounded text-[0.95rem] transition-colors duration-200 box-border focus:outline-none focus:border-[#007bff]"
-          >
-          <span v-if="error?.end_time" class="block mt-1 text-[#cc3333] text-[0.85rem]">{{ error.end_time[0] }}</span>
-        </div>
-
-        <div v-if="error?.message" class="mb-4 px-2.5 py-2 text-[#cc3333] text-[0.85rem] bg-[#ffeeee] border border-[#ffcccc] rounded">
+        <div v-if="error?.message" class="p-4 bg-[#FFF2F2] text-[#AF4E4E] text-xs font-bold rounded-2xl border border-[#FFDADA]">
           {{ error.message }}
         </div>
 
-        <button 
-          type="submit"
-          :disabled="loading"
-          class="w-full py-3 px-6 bg-[#28a745] text-white border-none rounded cursor-pointer text-base transition-colors duration-200 mt-2 hover:bg-[#218838] disabled:opacity-50 disabled:cursor-not-allowed"
-        >{{ loading ? $t("addForm.loading") : $t("addForm.add_entry") }}</button>
+        <div class="pt-4 flex flex-col gap-3">
+          <button 
+            type="submit"
+            :disabled="loading"
+            class="w-full py-5 bg-[#5A7D5A] text-white rounded-[1.5rem] font-black text-lg shadow-xl shadow-[#5A7D5A]/20 transition-all hover:bg-[#4a6b4a] hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:transform-none"
+          >
+            {{ loading ? t("addForm.loading") : t("addForm.add_entry") }}
+          </button>
+          
+          <button 
+            type="button"
+            @click="router.back()"
+            class="w-full py-4 text-[#8E9AAF] font-bold text-sm hover:text-[#333] transition-colors"
+          >
+            {{ t("update.cancel") || 'Go Back' }}
+          </button>
+        </div>
       </form>
     </div>
   </div>

@@ -27,6 +27,10 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+        RateLimiter::for('password-reset', function (Request $request) {
+            return Limit::perDay(5)->by($request->input('email') . '|' . $request->ip());
+        });
+        // essenially every user get to request a new reset 5 times a day per email 
 
         $this->routes(function () {
             Route::middleware('api')

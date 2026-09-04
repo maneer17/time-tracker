@@ -25,6 +25,19 @@ export const useAuthStore = defineStore('authStore', {
   } catch (error) { 
       return {success: false}
   }
+},
+async googleLogin(googleToken) {
+    const { data } = await apiClient.post('/api/auth/google', {
+        token: googleToken  // now an access token instead of ID token
+    })
+
+    this.token = data.token
+    this.user = data.user
+    this.isAuthenticated = true
+    localStorage.setItem('token', data.token)
+
+    router.push({ name: 'Home' })
+    return { success: true }
 }
 ,
     

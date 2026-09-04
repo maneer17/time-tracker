@@ -3,8 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\TimeEntry;
+use App\Models\{TimeEntry, User};
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,5 +14,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(UserSeeder::class);
         $this->call(TimeEntrySeeder::class);
+        $this->call(ChannelSeeder::class);
+        $this->call(MemberSeeder::class);
+        $this->call(InvitationSeeder::class);
+    
     }
 }
