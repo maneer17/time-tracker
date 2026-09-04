@@ -1,6 +1,7 @@
 <script setup>
 import { computed, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
+import ExportChannel from './ExportChannel.vue'
 
 const { t, locale } = useI18n()
 const channel = inject('channel')
@@ -17,7 +18,7 @@ const formattedCreatedAt = computed(() => {
 
 <template>
     <div class="max-w-3xl bg-white rounded-[3.5rem] p-10 shadow-[0_20px_60px_rgba(90,125,90,0.05)] border border-white">
-        
+        <ExportChannel :channel="channel"/>
         <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
             <div class="h-24 w-24 rounded-[2.2rem] bg-[#5A7D5A] flex-shrink-0 flex items-center justify-center text-white font-black text-4xl shadow-2xl shadow-[#5A7D5A]/20 uppercase">
                 {{ channel.name.charAt(0) }}

@@ -139,8 +139,8 @@ class ReportService
                 SELECT COUNT(DISTINCT label) as label_count
                 FROM time_entries
                 WHERE user_id = ?
-                AND created_at BETWEEN ? AND ?
-                GROUP BY DATE(created_at)
+                AND Date BETWEEN ? AND ?
+                GROUP BY Date
             ) as daily_counts
         ", [$userId, $from, $to]);
 

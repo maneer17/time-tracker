@@ -51,14 +51,13 @@ class NewSharedDayNotification extends Notification implements ShouldQueue
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([
-            'shared_day_id' => $this->sharedDay->id,
-            'channel_id' => $this->sharedDay->channel->id,
-            'from'          => $this->sharedDay->channel->owner->name,
-            'message'       => $this->sharedDay->channel->owner->name . ' shared a new day in ' . $this->sharedDay->channel->name,
-            'type'          => NotificationType::NewSharedDays->value,
+            'id'         => $this->id,
+            'type'       => $this->databaseType($notifiable),
+            'data'       => $this->toArray($notifiable),
+            'read_at'    => null,
+            'created_at' => now()->toISOString(),
         ]);
     }
-
     public function toMail(object $notifiable): MailMessage
     {
         $url = config('app.frontend_url') . '/channels/' . $this->sharedDay->channel_id;

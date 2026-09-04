@@ -24,6 +24,7 @@ export const useNotificationStore = defineStore('notifications', () => {
 
         echoChannel = window.Echo.private(`App.Models.User.${userId}`)
             .notification((notification) => {
+                console.log('RAW BROADCAST RECEIVED:', JSON.stringify(notification, null, 2))
                 notifications.value.unshift(notification)
                 if (unreadCount.value) {
                     unreadCount.value.count++

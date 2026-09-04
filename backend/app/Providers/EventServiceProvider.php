@@ -7,6 +7,8 @@ use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use \App\Events\{InvitationSent, AcceptedInvitationEvent, NewCommentEvent, NewSharedDayEvent, CommentDeletedByOwnerEvent};
 use \App\Listeners\{NewInvitationListener, AcceptedInvitationListener, NewCommentListener, NewSharedDayListener, CommentDeletedByOwnerListener};
+use App\Events\ChannelExportReadyEvent;
+use App\Listeners\ChannelExportReadyListener;
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -36,6 +38,9 @@ class EventServiceProvider extends ServiceProvider
         CommentDeletedByOwnerEvent::class => [
             CommentDeletedByOwnerListener::class,
         ],
+        ChannelExportReadyEvent::class => [
+            ChannelExportReadyListener::class,
+    ],
     ];
 
     /**

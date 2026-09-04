@@ -30,6 +30,7 @@ class InvitationController extends Controller
 
     public function store(StoreInvitationRequest $request, Channel $channel, InviteService $service )
     {
+        $this->authorize('create', [Invitation::class, $channel]);
         $validated = $request->validated();
         $identifier = $validated['identifier'];
         $invitation = $service->invite($identifier, $channel);

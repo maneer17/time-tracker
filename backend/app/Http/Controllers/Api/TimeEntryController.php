@@ -55,4 +55,6 @@ class TimeEntryController extends Controller
         $time_entry->delete();
         return new TimeEntryResource($time_entry);
     }
-}
+
+    }
+

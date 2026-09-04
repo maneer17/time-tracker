@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router'
 import useApi from '@/composables/useApi'
 import sharedDayService from '@/services/sharedDayService'
 import CommentsSection from './CommentsSection.vue'
-
+import ExportSharedDay from './ExportSharedDay.vue'
 const { t } = useI18n()
 const route = useRoute()
 
@@ -29,6 +29,9 @@ provide('sharedDay', sharedDay)
                     <h2 class="text-3xl font-black text-[#4A4A4A] tracking-tight">{{ sharedDay.date }}</h2>
                     <p class="text-[15px] text-[#8E9AAF] font-medium mt-1 italic">{{ t('shared_day_view.summary') }}</p>
                 </div>
+                <div>
+                    <ExportSharedDay :sharedDayId="sharedDay.id" />
+                </div>
                 <div class="text-right">
                     <span class="text-[11px] font-black text-[#A0A0A0] uppercase tracking-[0.2em] block mb-2">
                         {{ t('shared_day_view.total_time') }}
@@ -38,6 +41,7 @@ provide('sharedDay', sharedDay)
                         {{ sharedDay.total_time.minutes }}<span class="text-sm opacity-60 ml-0.5">m</span>
                     </span>
                 </div>
+               
             </header>
 
             <div class="space-y-4">

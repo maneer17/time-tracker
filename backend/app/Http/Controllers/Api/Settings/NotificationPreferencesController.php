@@ -12,7 +12,6 @@ class NotificationPreferencesController extends Controller
     /**
      * Display a listing of the resource.
      */
-// ✅ cleaner — uses the already defined relationship on the user
     public function index(Request $request)
     {
         return NotificationPreferencesResource::collection(

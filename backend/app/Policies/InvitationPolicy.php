@@ -11,7 +11,7 @@ class InvitationPolicy
     {
         return $channel->isOwner($user);
     }
-    public function create(User $user, Channel $channel): bool
+    public function create(User $user, User $invitedUser,  Channel $channel): bool
     {
         return $channel->isOwner($user);
     }

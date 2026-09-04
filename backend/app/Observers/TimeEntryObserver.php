@@ -8,6 +8,7 @@ class TimeEntryObserver
 {
     public function creating(TimeEntry $entry): void
     {
+        $entry->date ??= today()->format('Y-m-d');
         $entry->duration_minutes = $entry->start_time->diffInMinutes($entry->end_time);
     }
 

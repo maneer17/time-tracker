@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -46,6 +46,12 @@ class User extends Authenticatable
     public function notificationTypes() :HasMany
     {
         return $this->hasMany(NotificationsTypes::class);
+    }
+    public function orgs(): BelongsToMany
+    {
+        return $this->belongsToMany(Organization::class)
+                    ->withPivot('role')
+                    ->withTimestamps();
     }
 
     /**

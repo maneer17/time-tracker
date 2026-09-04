@@ -19,9 +19,10 @@ class InviteService
                 'identifier' => ['User not found for the given identifier.'],
             ]);
         }
-
+        $this->ensureSameOrganization($user, $channel);
         $this->ensureNotOwner($user, $channel);
         $this->ensureNotMember($user, $channel);
+        
 
         return $this->updateOrCreate($user, $channel);
     }
@@ -48,6 +49,18 @@ class InviteService
         if ($channel->isMember($user)) {
             throw ValidationException::withMessages([
                 'identifier' => ['This user is already a member of this channel.'],
+            ]);
+        }
+    }
+    private function ensureSameOrganization(User $user, Channel $channel): void
+    {
+        $inOrg = $user->orgs()
+            ->wherePivot('organization_id', $channel->organization_id)
+            ->exists();
+
+        if (! $inOrg) {
+            throw ValidationException::withMessages([
+                'identifier' => ['This user must join the organization before being invited to a channel.'],
             ]);
         }
     }

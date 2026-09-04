@@ -26,7 +26,7 @@ class SharedDayController extends Controller
     {
         $this->authorize('view', $channel);
 
-        return new SharedDayResource($sharedDay->load(['entries.timeEntry', 'channel']));
+        return new SharedDayResource($sharedDay->load(['entries.timeEntry', 'channel', 'comments.author']));
     }
 
     // POST /shared-days

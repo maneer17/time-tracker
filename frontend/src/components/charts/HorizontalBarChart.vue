@@ -12,7 +12,7 @@ const props = defineProps({
             indexAxis: 'y',  
             responsive: true,
             plugins: {
-                legend: { display: false }
+                legend: { display: true }
             }
         })
     }

@@ -27,7 +27,7 @@ class AcceptedInvitationNotification extends Notification implements ShouldQueue
     public function via(object $notifiable): array
     {
         return $this->viaEmail($notifiable, NotificationType::AcceptedInvitations)
-            ? ['database', 'broadcast', 'mail']
+            ? ['database', 'broadcast']
             : ['database', 'broadcast'];
     }
 
@@ -50,11 +50,11 @@ class AcceptedInvitationNotification extends Notification implements ShouldQueue
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([
-            'invitation_id' => $this->invitation->id,
-            'channel_id' => $this->invitation->channel->id,
-            'from'          => $this->invitation->invitedUser->name,
-            'message'       => $this->invitation->invitedUser->name . ' accepted your invitation to ' . $this->invitation->channel->name,
-            'type'          => NotificationType::AcceptedInvitations->value,
+            'id'         => $this->id,
+            'type'       => $this->databaseType($notifiable),
+            'data'       => $this->toArray($notifiable),
+            'read_at'    => null,
+            'created_at' => now()->toISOString(),
         ]);
     }
 

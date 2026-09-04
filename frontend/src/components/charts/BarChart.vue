@@ -11,7 +11,7 @@ const props = defineProps({
         default: () => ({
             responsive: true,
             plugins: {
-                legend: { display: false }
+                legend: { display: true }
             }
         })
     }

@@ -1,3 +1,4 @@
+<!-- NotificationItem.vue -->
 <script setup>
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -14,11 +15,12 @@ const props = defineProps(['notification'])
 const getRoute = (notification) => {
     const { type, data } = notification
     switch (type) {
-        case 'channel_invitations':  return '/my-invitations'
-        case 'accepted_invitations': return `/channels/${data.channel_id}`
-        case 'new_comments':         return `/channels/${data.channel_id}/shared-days/${data.shared_day_id}`
-        case 'new_shared_days':      return `/channels/${data.channel_id}`
-        default:                     return '/'
+        case 'channel_invitations':   return '/my-invitations'
+        case 'accepted_invitations':  return `/channels/${data.channel_id}`
+        case 'new_comments':          return `/channels/${data.channel_id}/shared-days/${data.shared_day_id}`
+        case 'new_shared_days':       return `/channels/${data.channel_id}`
+        case 'channel_export_ready':  return data.download_url
+        default:                      return '/'
     }
 }
 
@@ -26,6 +28,15 @@ const handleClick = async () => {
     if (!props.notification.read_at) {
         await notificationStore.markAsRead(props.notification.id)
     }
+
+    // export-ready notifications point to an external backend file URL,
+    // not an internal Vue route — router.push() can't handle that,
+    // so we branch and open it directly in a new tab instead
+    if (props.notification.type === 'channel_export_ready') {
+        window.open(props.notification.data.download_url, '_blank')
+        return
+    }
+
     router.push(getRoute(props.notification))
 }
 

@@ -52,13 +52,11 @@ class NewCommentNotification extends Notification implements ShouldQueue
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([
-            'comment_id' => $this->comment->id,
-            'from'       => $this->comment->author->name,
-            'message'    => $this->comment->author->name . ' commented on your shared day: ' . Str::limit($this->comment->body, 50),
-            'type'       => NotificationType::NewComments->value,
-            'channel_id' => $this->comment->sharedDay->channel->id,
-            'shared_day_id' => $this->comment->sharedDay->id
-            
+            'id'         => $this->id,
+            'type'       => $this->databaseType($notifiable),
+            'data'       => $this->toArray($notifiable),
+            'read_at'    => null,
+            'created_at' => now()->toISOString(),
         ]);
     }
 

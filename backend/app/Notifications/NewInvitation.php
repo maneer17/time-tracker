@@ -29,7 +29,7 @@ class NewInvitation extends Notification implements ShouldQueue
     {
         // check if user has email enabled for this notification type
         return $this->viaEmail($notifiable, NotificationType::ChannelInvitations)
-            ? ['database', 'broadcast', 'mail']
+            ? ['database', 'broadcast',]
             : ['database', 'broadcast'];
     }
 
@@ -54,15 +54,12 @@ class NewInvitation extends Notification implements ShouldQueue
 
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
-        // this is what gets pushed to the frontend in real-time via Reverb
-        // should match toArray() so the frontend receives consistent data
-        // whether the notification comes from DB on page load or real-time via Echo
         return new BroadcastMessage([
-            'invitation_id' => $this->invitation->id,
-            'channel_id' => $this->invitation->channel->id,
-            'from'          => $this->invitation->invitedBy->name,
-            'message'       => $this->invitation->invitedBy->name . ' invited you to ' . $this->invitation->channel->name,
-            'type'          => NotificationType::ChannelInvitations->value,
+            'id'         => $this->id,
+            'type'       => $this->databaseType($notifiable),
+            'data'       => $this->toArray($notifiable),
+            'read_at'    => null,
+            'created_at' => now()->toISOString(),
         ]);
     }
 
