@@ -1,4 +1,4 @@
-FROM php:8.2-fpm       
+FROM php:8.3-fpm
 
 WORKDIR /var/www/html
 
@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    cron             
+    cron
 
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 

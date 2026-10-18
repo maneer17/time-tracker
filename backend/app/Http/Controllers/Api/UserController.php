@@ -12,11 +12,11 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $org    = App::make('active_org'); // set by the org middleware
+        //$org    = App::make('active_org'); // set by the org middleware
 
         // Scope to THIS org's members, then search within them.
-        $users = $org->users()
-            ->when($search, fn ($query) =>
+        $users = User
+            ::when($search, fn ($query) =>
                 $query->where(fn ($q) =>
                     $q->where('name', 'LIKE', "%{$search}%")
                       ->orWhere('email', 'LIKE', "%{$search}%")

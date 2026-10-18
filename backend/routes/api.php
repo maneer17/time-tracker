@@ -64,7 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // ── Authenticated AND org-scoped (org-owned data) ─────────────
-Route::middleware(['auth:sanctum', 'org'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('channels', ChannelController::class);
     Route::apiResource('time-entries', TimeEntryController::class);

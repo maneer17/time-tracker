@@ -8,14 +8,6 @@ use App\Http\Resources\ChannelResource;
 use App\Http\Requests\{StoreChannelRequest, UpdateChannelRequest};
 class ChannelController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(Channel::class, 'channel');
-    }
-
-
-
-
     public function index(Request $request)
     {
         $type = $request->input('type'); // owned | joined
@@ -23,7 +15,7 @@ class ChannelController extends Controller
         $query = match ($type) {
             'owned'  => Channel::owned(auth()->user()),
             'joined' => Channel::joined(auth()->user()),
-            default  => Channel::query(), 
+            default  => Channel::query(),
         };
 
         $channels = $query

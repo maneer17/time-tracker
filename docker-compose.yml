@@ -53,7 +53,7 @@ services:
     container_name: nginx_server
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8080:80"
     volumes:
       - ./backend:/var/www/html
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -80,7 +80,7 @@ services:
     volumes:
       - ./backend:/var/www/html
     env_file:
-      - ./backend/.env   
+      - ./backend/.env
     depends_on:
       db:
         condition: service_healthy
@@ -104,7 +104,7 @@ services:
       db:
         condition: service_healthy
     networks:
-      - app-network    
+      - app-network
 
   reverb:
     build:
@@ -115,14 +115,14 @@ services:
     volumes:
       - ./backend:/var/www/html
     env_file:
-      - ./backend/.env            
+      - ./backend/.env
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
     networks:
-      - app-network    
+      - app-network
 
 volumes:
   db_data:
