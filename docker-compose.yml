@@ -1,18 +1,28 @@
-version: '3.8'
+# Shared settings for every Laravel container (queue, scheduler, reverb, backend)
+x-laravel: &laravel
+  build:
+    context: ./backend
+  restart: unless-stopped
+  volumes:
+    # PROD: remove this bind mount. The code is baked into the image instead.
+    - ./backend:/var/www/html
+  env_file:
+    # PROD: ./backend/.env.production (it lives only on the server)
+    - ./backend/.env.docker
+  networks:
+    - app-network
 
 services:
-
-  # ── 1. MySQL Database ───────────────────────────────────────
   db:
     image: mysql:8.0
     container_name: mysql_db
     restart: unless-stopped
-    environment: # these override the env files in backend/.env file since they change when running docker
-      DB_HOST: db                          # 127.0.0.1 → service name
+    environment:
       MYSQL_DATABASE: time-tracker
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_USER: manar
-      MYSQL_PASSWORD: manar21
+      # PROD: strong random values in the server's root .env
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -20,6 +30,7 @@ services:
       retries: 5
     volumes:
       - db_data:/var/lib/mysql
+    # PROD: never add "ports:" here. MySQL stays internal.
     networks:
       - app-network
 
@@ -27,106 +38,82 @@ services:
     image: redis:alpine
     container_name: redis_cache
     restart: unless-stopped
+    # PROD: add --requirepass ${REDIS_PASSWORD} and set REDIS_PASSWORD in .env.production
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_data:/data
     networks:
       - app-network
 
   backend:
-    build:
-      context: ./backend
+    <<: *laravel
     container_name: laravel_app
-    restart: unless-stopped
-    volumes:
-      - ./backend:/var/www/html
-    env_file:
-      - ./backend/.env
+    command: sh /var/www/html/start.sh
     depends_on:
       db:
         condition: service_healthy
       redis:
-        condition: service_started
-    command: sh /var/www/html/start.sh
-    networks:
-      - app-network
+        condition: service_healthy
+    healthcheck:
+      # healthy once PHP-FPM listens on 9000, i.e. after start.sh finished
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1', 9000) ? 0 : 1);"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+
+  queue:
+    <<: *laravel
+    container_name: laravel_queue
+    command: php artisan queue:work --timeout=90
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  scheduler:
+    <<: *laravel
+    container_name: laravel_scheduler
+    command: php artisan schedule:work
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  reverb:
+    <<: *laravel
+    container_name: laravel_reverb
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    depends_on:
+      backend:
+        condition: service_healthy
 
   nginx:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+      args:
+        # PROD: production (the frontend then reads frontend/.env.production)
+        BUILD_MODE: docker
     container_name: nginx_server
     restart: unless-stopped
     ports:
+      # PROD: "80:80" and "443:443"
       - "8080:80"
-    volumes:
-      - ./backend:/var/www/html
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - backend
-      - frontend
-    networks:
-      - app-network
-
-  frontend:
-    build:
-      context: ./frontend
-    container_name: vue_app
-    restart: unless-stopped
-    networks:
-      - app-network
-
-  queue:
-    build:
-      context: ./backend
-    container_name: laravel_queue
-    restart: unless-stopped
-    command: php artisan queue:work  --timeout=90
-    volumes:
-      - ./backend:/var/www/html
-    env_file:
-      - ./backend/.env
-    depends_on:
-      db:
+      backend:
         condition: service_healthy
-      redis:
-        condition: service_started
-    networks:
-      - app-network
-
-  scheduler:
-    build:
-      context: ./backend
-    container_name: laravel_scheduler
-    restart: unless-stopped
-    volumes:
-      - ./backend:/var/www/html
-      - ./docker/cron/scheduler:/etc/cron.d/scheduler
-    env_file:
-      - ./backend/.env
-    command: sh -c "chmod 0644 /etc/cron.d/scheduler && cron -f"
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - app-network
-
-  reverb:
-    build:
-      context: ./backend
-    container_name: laravel_reverb
-    restart: unless-stopped
-    command: php artisan reverb:start --host=0.0.0.0 --port=8080
-    volumes:
-      - ./backend:/var/www/html
-    env_file:
-      - ./backend/.env
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
+      reverb:
         condition: service_started
     networks:
       - app-network
 
 volumes:
   db_data:
-
+  redis_data:
 
 networks:
   app-network:

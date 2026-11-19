@@ -37,6 +37,7 @@ class NewSharedDayNotification extends Notification implements ShouldQueue
         return [
             'shared_day_id' => $this->sharedDay->id,
             'channel_id' => $this->sharedDay->channel->id,
+            'channel_name'  => $this->sharedDay->channel->name,
             'from'          => $this->sharedDay->channel->owner->name,
             'message'       => $this->sharedDay->channel->owner->name . ' shared a new day in ' . $this->sharedDay->channel->name,
             'type'          => NotificationType::NewSharedDays->value,

@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Builder, Model};
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 use Illuminate\Database\Eloquent\Casts\Attribute;
 class Channel extends Model
 {
-    use HasFactory, BelongsToOrganization;
+    use HasFactory;
 
     protected $fillable = ['user_id', 'name', 'description'];
 
@@ -36,6 +35,14 @@ class Channel extends Model
 
     public function scopeOwned(Builder $query, User $user): Builder{
         return $query->where('user_id', $user->id);
+    }
+
+    /** Channels the user owns or has joined. */
+    public function scopeAccessibleTo(Builder $query, User $user): Builder
+    {
+        return $query->where(fn (Builder $q) => $q
+            ->where('user_id', $user->id)
+            ->orWhereHas('members', fn ($members) => $members->where('user_id', $user->id)));
     }
 
     public function scopeJoined(Builder $query, User $user ): Builder{

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Builder, Model};
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -10,7 +9,7 @@ use Illuminate\Support\Carbon;
 
 class TimeEntry extends Model
 {
-    use HasFactory, BelongsToOrganization;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',

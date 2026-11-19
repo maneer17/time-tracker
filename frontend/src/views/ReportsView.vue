@@ -6,9 +6,11 @@ import reportService from '@/services/reportService'
 import HorizontalBarChart from '@/components/charts/HorizontalBarChart.vue'
 import DoughnutChart from '@/components/charts/DoughnutChart.vue'
 import ReportExportButton from '@/components/charts/ReportExportButton.vue'
+import { useLocaleFormat } from '@/composables/useLocaleFormat'
 // ↑ added — was missing, component was used but never imported
 
 const { t } = useI18n()
+const { formatDate } = useLocaleFormat()
 
 // ── Chart refs ─────────────────────────────────────────────
 const totalTimeChartRef = ref(null)
@@ -35,8 +37,9 @@ const captureCharts = () => {
 }
 
 // ── Date range ─────────────────────────────────────────────
-const to   = ref(new Date().toISOString().split('T')[0])
-const from = ref(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+const localDay = (d) => d.toLocaleDateString('en-CA') // YYYY-MM-DD in the user's own timezone
+const to   = ref(localDay(new Date()))
+const from = ref(localDay(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)))
 const isRefresh = ref(false)
 
 // ── API ────────────────────────────────────────────────────
@@ -61,20 +64,21 @@ const handleRefresh = async () => {
 
 // ── Colors ─────────────────────────────────────────────────
 const COLORS = [
-    '#5A7D5A',
-    '#D4A373',
-    '#E07A5F',
-    '#8E9AAF',
-    '#D4E2D4',
-    '#F2E9E4'
+    '#083A4F',
+    '#A58D66',
+    '#991B1B',
+    '#5F7480',
+    '#C0D5D6',
+    '#F3EEE4'
 ]
 
 // ── Chart data ─────────────────────────────────────────────
 const totalTimeChartData = computed(() => ({
     labels: data.value.total_time_by_label.map(row => row.label),
     datasets: [{
-        data: data.value.total_time_by_label.map(row => row.hours * 60 + row.minutes),
-        backgroundColor: '#D4A373',
+        label: t('reports.minutes'),
+        data: data.value.total_time_by_label.map(row => Number(row.total_minutes)),
+        backgroundColor: '#407E8C',
         borderRadius: 12,
     }]
 }))
@@ -89,77 +93,45 @@ const mostUsedLabelsChartData = computed(() => ({
     }]
 }))
 // ↑ removed avgTimeChartData and tooltipMinutesPlugin — unused
+
+// ── Display helpers ────────────────────────────────────────
+const hm = (hours, minutes) =>
+    `${hours}${t('units.hours_short')} ${String(minutes).padStart(2, '0')}${t('units.minutes_short')}`
+const fromMinutes = (total) => hm(Math.floor(total / 60), Math.round(total % 60))
+
+const rangeLabel = computed(() => t('reports.range', {
+    from: formatDate(from.value, { month: 'short', day: 'numeric' }),
+    to: formatDate(to.value, { month: 'short', day: 'numeric', year: 'numeric' }),
+}))
+
+// One row per label: total time, average per entry and share of the whole range.
+const labelRows = computed(() => {
+    const rows = data.value?.total_time_by_label ?? []
+    const sum = rows.reduce((acc, r) => acc + Number(r.total_minutes), 0)
+    const avg = Object.fromEntries((data.value?.avg_time_per_label ?? []).map((r) => [r.label, Number(r.avg_minutes)]))
+
+    return rows.map((r) => ({
+        label: r.label,
+        total: fromMinutes(Number(r.total_minutes)),
+        avg: fromMinutes(avg[r.label] ?? 0),
+        share: sum ? Math.round((Number(r.total_minutes) / sum) * 1000) / 10 : 0,
+    }))
+})
 </script>
 
 <template>
-    <div class="max-w-5xl mx-auto px-8 py-12">
+    <div class="min-h-screen flex flex-col">
 
         <!-- Page header -->
-        <div class="mb-10">
-            <h1 class="text-3xl font-black text-[#4A4A4A] tracking-tight">
-                {{ t('reports.title') }}
-            </h1>
-            <p class="text-[15px] text-[#8E9AAF] font-medium mt-1 italic">
-                {{ t('reports.subtitle') }}
-            </p>
-        </div>
+        <header class="bg-white border-b border-[#D9D4CE] px-4 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl lg:text-3xl font-bold tracking-tight">{{ t('reports.title') }}</h1>
+                <span v-if="data" class="inline-flex px-2.5 py-1 rounded-full bg-[#C0D5D6] text-[#083A4F] text-xs font-semibold tabular-nums">
+                    {{ hm(data.quick_stats.total_hours, data.quick_stats.total_minutes) }}
+                </span>
+            </div>
 
-        <!-- Filter bar wrapper — form + export button sit side by side -->
-        <div class="flex flex-wrap items-end gap-4 p-8 bg-white border-2 
-                    border-[#F9F7F2] rounded-[2rem] shadow-sm mb-12">
-
-            <!-- Generate form — only controls date range + generate/refresh -->
-            <form @submit.prevent="handleGenerate"
-                class="flex flex-wrap items-end gap-6 flex-1">
-
-                <div class="flex flex-col gap-2">
-                    <label class="text-[11px] font-black text-[#A0A0A0] uppercase tracking-[0.15em] px-1">
-                        {{ t('reports.from') }}
-                    </label>
-                    <input
-                        type="date"
-                        v-model="from"
-                        class="px-5 py-3 bg-[#F9F7F2] border-2 border-transparent rounded-2xl 
-                               text-[14px] font-bold text-[#4A4A4A] focus:outline-none 
-                               focus:border-[#5A7D5A] focus:bg-white transition" />
-                </div>
-
-                <div class="flex flex-col gap-2">
-                    <label class="text-[11px] font-black text-[#A0A0A0] uppercase tracking-[0.15em] px-1">
-                        {{ t('reports.to') }}
-                    </label>
-                    <input
-                        type="date"
-                        v-model="to"
-                        class="px-5 py-3 bg-[#F9F7F2] border-2 border-transparent rounded-2xl 
-                               text-[14px] font-bold text-[#4A4A4A] focus:outline-none 
-                               focus:border-[#5A7D5A] focus:bg-white transition" />
-                </div>
-
-                <div class="flex items-center gap-4 ml-auto">
-                    <button
-                        type="button"
-                        @click="handleRefresh"
-                        :disabled="loading"
-                        class="px-4 py-3 text-[#A0A0A0] hover:text-[#4A4A4A] text-[13px] 
-                               font-black uppercase tracking-widest transition disabled:opacity-50">
-                        🔄 {{ t('reports.refresh') }}
-                    </button>
-
-                    <button
-                        type="submit"
-                        :disabled="loading"
-                        class="px-8 py-3 bg-[#E07A5F] hover:bg-[#D6684D] text-white text-[13px] 
-                               font-black uppercase tracking-widest rounded-2xl disabled:opacity-50 
-                               transition shadow-xl shadow-[#E07A5F]/20 active:scale-95">
-                        {{ loading ? '...' : t('reports.generate') }}
-                    </button>
-                </div>
-
-            </form>
-            <!-- form ends here — ReportExportButton is outside it -->
-
-            <!-- Export button — only appears after data is loaded -->
+            <!-- Export button only appears once a report has been generated -->
             <ReportExportButton
                 v-if="data"
                 :from="from"
@@ -167,93 +139,121 @@ const mostUsedLabelsChartData = computed(() => ({
                 :capture-charts="captureCharts"
                 :captured-charts="capturedCharts"
             />
-            <!-- v-if="data" — no point showing export before report is generated -->
-            <!-- :capture-charts — passes the function, child calls it on click -->
-            <!-- :captured-charts — passes the base64 strings once captured -->
+        </header>
 
-        </div>
+        <main class="p-4 lg:p-8 flex flex-col gap-6 min-w-0">
 
-        <!-- Report content — only renders when data exists -->
-        <div v-if="data" class="space-y-12">
+            <!-- Date range -->
+            <form @submit.prevent="handleGenerate"
+                  class="bg-white border border-[#D9D4CE] rounded-3xl p-4 flex flex-wrap items-end justify-between gap-4">
+                <div class="flex flex-wrap items-end gap-3">
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-xs font-medium">{{ t('reports.from') }}</span>
+                        <input type="date" v-model="from"
+                               class="rounded-xl border border-[#C0D5D6] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#083A4F] focus:ring-2 focus:ring-[#083A4F]/15" />
+                    </label>
 
-            <!-- Quick stats -->
-            <section>
-                <h2 class="text-[11px] font-black text-[#A0A0A0] uppercase tracking-[0.15em] mb-6 px-2">
-                    {{ t('reports.quick_stats.title') }}
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-xs font-medium">{{ t('reports.to') }}</span>
+                        <input type="date" v-model="to"
+                               class="rounded-xl border border-[#C0D5D6] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#083A4F] focus:ring-2 focus:ring-[#083A4F]/15" />
+                    </label>
 
-                    <div class="p-8 bg-white border-2 border-[#F9F7F2] rounded-[2.5rem] hover:shadow-md transition-shadow">
-                        <p class="text-[11px] font-black text-[#A0A0A0] uppercase tracking-[0.1em] mb-3">
-                            {{ t('reports.quick_stats.total_entries') }}
-                        </p>
-                        <p class="text-3xl font-black text-[#4A4A4A]">
-                            {{ data.quick_stats.total_entries }}
-                        </p>
-                    </div>
-
-                    <div class="p-8 bg-white border-2 border-[#F9F7F2] rounded-[2.5rem] hover:shadow-md transition-shadow">
-                        <p class="text-[11px] font-black text-[#A0A0A0] uppercase tracking-[0.1em] mb-3">
-                            {{ t('reports.quick_stats.total_time') }}
-                        </p>
-                        <p class="text-3xl font-black text-[#4A4A4A]">
-                            {{ data.quick_stats.total_hours }}<span class="text-xl text-[#A0A0A0] ml-1">h</span>
-                            {{ data.quick_stats.total_minutes }}<span class="text-xl text-[#A0A0A0] ml-1">m</span>
-                        </p>
-                    </div>
-
-                    <div class="p-8 bg-[#5A7D5A] rounded-[2.5rem] shadow-2xl shadow-[#5A7D5A]/20">
-                        <p class="text-[11px] font-black text-white/70 uppercase tracking-[0.1em] mb-3">
-                            {{ t('reports.quick_stats.daily_avg') }}
-                        </p>
-                        <p class="text-3xl font-black text-white">
-                            {{ data.quick_stats.avg_hours_per_day }}<span class="text-xl opacity-60 ml-1">h</span>
-                            {{ data.quick_stats.avg_minutes_per_day }}<span class="text-xl opacity-60 ml-1">m</span>
-                        </p>
-                    </div>
-
+                    <button type="submit" :disabled="loading"
+                            class="h-10 px-5 rounded-full bg-[#083A4F] text-white text-sm font-medium hover:bg-[#407E8C] transition-colors disabled:opacity-50">
+                        {{ loading ? '...' : t('reports.generate') }}
+                    </button>
                 </div>
-            </section>
 
-            <!-- Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <button type="button" @click="handleRefresh" :disabled="loading"
+                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium text-[#3E5660] hover:bg-[#EFECE8] hover:text-[#083A4F] transition-colors disabled:opacity-50">
+                    <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v5h5M20 20v-5h-5M5.64 15A8 8 0 0018.36 9M18.36 9A8 8 0 005.64 15" /></svg>
+                    {{ t('reports.refresh') }}
+                </button>
+            </form>
 
-                <section class="lg:col-span-3 p-10 bg-white border-2 border-[#F9F7F2] rounded-[3rem]">
-                    <h2 class="text-[11px] font-black text-[#A0A0A0] uppercase tracking-[0.2em] mb-8">
-                        {{ t('reports.charts.time_distribution') }}
-                    </h2>
-                    <HorizontalBarChart
-                        ref="totalTimeChartRef"
-                        :chart-data="totalTimeChartData" />
-                    <!-- ref="totalTimeChartRef" → Vue puts this component instance
-                         into totalTimeChartRef so captureCharts() can access its canvas -->
+            <!-- Report content — only renders when data exists -->
+            <template v-if="data">
+
+                <!-- Quick stats -->
+                <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 items-stretch">
+                    <article class="bg-white border border-[#D9D4CE] rounded-3xl p-4 lg:p-5 flex flex-col justify-between gap-2">
+                        <h2 class="text-xs font-medium text-[#3E5660]">{{ t('reports.quick_stats.total_time') }}</h2>
+                        <div>
+                            <p class="text-xl lg:text-2xl font-semibold tabular-nums">{{ hm(data.quick_stats.total_hours, data.quick_stats.total_minutes) }}</p>
+                            <p class="text-xs text-[#5F7480] mt-0.5">{{ rangeLabel }}</p>
+                        </div>
+                    </article>
+
+                    <article class="bg-white border border-[#D9D4CE] rounded-3xl p-4 lg:p-5 flex flex-col justify-between gap-2">
+                        <h2 class="text-xs font-medium text-[#3E5660]">{{ t('reports.quick_stats.total_entries') }}</h2>
+                        <div>
+                            <p class="text-xl lg:text-2xl font-semibold tabular-nums">{{ data.quick_stats.total_entries }}</p>
+                            <p class="text-xs text-[#5F7480] mt-0.5">{{ t('reports.labels_count', data.total_time_by_label.length) }}</p>
+                        </div>
+                    </article>
+
+                    <article class="bg-white border border-[#D9D4CE] rounded-3xl p-4 lg:p-5 flex flex-col justify-between gap-2">
+                        <h2 class="text-xs font-medium text-[#3E5660]">{{ t('reports.active_days') }}</h2>
+                        <div>
+                            <p class="text-xl lg:text-2xl font-semibold tabular-nums">{{ data.quick_stats.total_days }}</p>
+                            <p class="text-xs text-[#5F7480] mt-0.5">{{ t('reports.labels_per_day', { n: data.avg_labels_per_day }) }}</p>
+                        </div>
+                    </article>
+
+                    <article class="bg-[#083A4F] text-white rounded-3xl p-4 lg:p-5 flex flex-col justify-between gap-2">
+                        <h2 class="text-xs font-medium text-white/70">{{ t('reports.quick_stats.daily_avg') }}</h2>
+                        <p class="text-xl lg:text-2xl font-semibold tabular-nums">{{ hm(data.quick_stats.avg_hours_per_day, data.quick_stats.avg_minutes_per_day) }}</p>
+                    </article>
                 </section>
 
-                <section class="lg:col-span-2 p-10 bg-white border-2 border-[#F9F7F2] rounded-[3rem]">
-                    <h2 class="text-[11px] font-black text-[#A0A0A0] uppercase tracking-[0.2em] mb-8">
-                        {{ t('reports.charts.most_used') }}
-                    </h2>
-                    <div class="w-full max-w-[220px] mx-auto mb-10">
-                        <DoughnutChart
-                            ref="mostUsedChartRef"
-                            :chart-data="mostUsedLabelsChartData" />
-                        <!-- ref="mostUsedChartRef" → same idea, second chart -->
+                <!-- Charts -->
+                <section class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-4 items-stretch">
+                    <article class="bg-white border border-[#D9D4CE] rounded-3xl p-5 flex flex-col gap-4">
+                        <h2 class="font-semibold">{{ t('reports.charts.time_distribution') }}</h2>
+                        <!-- ref → captureCharts() reads this canvas to build the PDF -->
+                        <HorizontalBarChart ref="totalTimeChartRef" :chart-data="totalTimeChartData" />
+                    </article>
+
+                    <article class="bg-white border border-[#D9D4CE] rounded-3xl p-5 flex flex-col gap-4">
+                        <h2 class="font-semibold">{{ t('reports.charts.most_used') }}</h2>
+                        <div class="w-full max-w-[240px] mx-auto">
+                            <DoughnutChart ref="mostUsedChartRef" :chart-data="mostUsedLabelsChartData" />
+                        </div>
+                        <ul class="flex flex-col gap-2.5">
+                            <li v-for="(row, i) in data.most_used_labels" :key="row.label" class="flex items-center justify-between gap-3">
+                                <span class="flex items-center gap-2 min-w-0">
+                                    <span class="w-2.5 h-2.5 rounded-full shrink-0" :style="{ background: COLORS[i % COLORS.length] }"></span>
+                                    <span class="text-sm truncate">{{ row.label }}</span>
+                                </span>
+                                <span class="text-xs font-semibold text-[#083A4F] bg-[#C0D5D6] px-2.5 py-1 rounded-full tabular-nums">{{ row.percentage }}%</span>
+                            </li>
+                        </ul>
+                    </article>
+                </section>
+
+                <!-- Time by label -->
+                <section class="bg-white border border-[#D9D4CE] rounded-3xl overflow-hidden">
+                    <h2 class="px-5 py-4 font-semibold border-b border-[#D9D4CE]">{{ t('reports.table_title') }}</h2>
+
+                    <div class="px-5 py-3 bg-[#EFECE8] border-b border-[#D9D4CE] grid grid-cols-[1fr_auto_auto] sm:grid-cols-[1fr_110px_110px_70px] gap-4 text-xs font-medium text-[#3E5660]">
+                        <span>{{ t('reports.col_label') }}</span>
+                        <span class="hidden sm:block text-end">{{ t('reports.col_avg') }}</span>
+                        <span class="text-end">{{ t('reports.col_total') }}</span>
+                        <span class="text-end">{{ t('reports.col_share') }}</span>
                     </div>
-                    <div class="space-y-4">
-                        <div v-for="(row, i) in data.most_used_labels.slice(0, 4)"
-                            :key="i"
-                            class="flex items-center justify-between">
-                            <span class="text-[14px] font-bold text-[#4A4A4A]">{{ row.label }}</span>
-                            <span class="text-[13px] font-black text-[#E07A5F] bg-[#FFF2F0] px-3 py-1 rounded-full">
-                                {{ row.percentage }}%
-                            </span>
+
+                    <div class="divide-y divide-[#D9D4CE]">
+                        <div v-for="row in labelRows" :key="row.label"
+                             class="px-5 py-3 grid grid-cols-[1fr_auto_auto] sm:grid-cols-[1fr_110px_110px_70px] gap-4 items-center text-sm">
+                            <span class="truncate">{{ row.label }}</span>
+                            <span class="hidden sm:block text-end text-[#3E5660] tabular-nums">{{ row.avg }}</span>
+                            <span class="text-end tabular-nums">{{ row.total }}</span>
+                            <span class="hidden sm:block text-end font-semibold text-[#083A4F] tabular-nums">{{ row.share }}%</span>
                         </div>
                     </div>
                 </section>
-
-            </div>
-
-        </div>
-
+            </template>
+        </main>
     </div>
 </template>

@@ -15,7 +15,7 @@ class ChannelController extends Controller
         $query = match ($type) {
             'owned'  => Channel::owned(auth()->user()),
             'joined' => Channel::joined(auth()->user()),
-            default  => Channel::query(),
+            default  => Channel::accessibleTo(auth()->user()),
         };
 
         $channels = $query
@@ -40,8 +40,9 @@ class ChannelController extends Controller
      */
     public function show(Channel $channel)
     {
-        $channel->load(['members.user', 'invitations'])
-                ->loadCount('members');
+        $this->authorize('view', $channel);
+
+        $channel->load('members.user')->loadCount('members');
 
         return new ChannelResource($channel);
     }
@@ -51,6 +52,8 @@ class ChannelController extends Controller
      */
     public function update(UpdateChannelRequest $request, Channel $channel)
     {
+        $this->authorize('update', $channel);
+
         $validated = $request->validated();
         $channel->update($validated);
         return new ChannelResource($channel);
@@ -61,6 +64,8 @@ class ChannelController extends Controller
      */
     public function destroy(Channel $channel)
     {
+        $this->authorize('delete', $channel);
+
         $channel->delete();
         return new ChannelResource($channel);
     }

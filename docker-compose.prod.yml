@@ -1,0 +1,142 @@
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-laravel: &laravel
+  build:
+    context: ./backend
+    target: prod
+  restart: unless-stopped
+  env_file:
+    - ./backend/.env.production
+  volumes:
+    # Shared by backend, queue and scheduler: queue jobs write export files that the API serves
+    - storage_data:/var/www/html/storage
+  logging: *logging
+  networks:
+    - app-network
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: time-tracker
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/mysql
+    logging: *logging
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    container_name: redis_cache
+    restart: unless-stopped
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--requirepass",
+        "${REDIS_PASSWORD}",
+      ]
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_data:/data
+    logging: *logging
+    networks:
+      - app-network
+
+  backend:
+    <<: *laravel
+    container_name: laravel_app
+    command: sh /var/www/html/start.sh
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1', 9000) ? 0 : 1);"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+
+  queue:
+    <<: *laravel
+    container_name: laravel_queue
+    user: www-data
+    command: php artisan queue:work --timeout=90
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  scheduler:
+    <<: *laravel
+    container_name: laravel_scheduler
+    user: www-data
+    command: php artisan schedule:work
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  reverb:
+    <<: *laravel
+    container_name: laravel_reverb
+    user: www-data
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+      args:
+        BUILD_MODE: production
+        NGINX_CONF: default.prod.conf
+    container_name: nginx_server
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+      reverb:
+        condition: service_started
+    logging: *logging
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+  redis_data:
+  storage_data:
+  letsencrypt:
+    external: true
+
+networks:
+  app-network:
+    driver: bridge

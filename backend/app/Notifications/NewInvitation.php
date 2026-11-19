@@ -42,6 +42,7 @@ class NewInvitation extends Notification implements ShouldQueue
             'invitation_id' => $this->invitation->id,
             'from'          => $this->invitation->invitedBy->name,
             'channel_id' => $this->invitation->channel->id,
+            'channel_name'  => $this->invitation->channel->name,
             'message'       => $this->invitation->invitedBy->name . ' invited you to ' . $this->invitation->channel->name,
             'type'          => NotificationType::ChannelInvitations->value,
         ];

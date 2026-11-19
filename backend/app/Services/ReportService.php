@@ -30,7 +30,7 @@ class ReportService
         ->selectRaw('
             COUNT(*) as total_entries,
             SUM(duration_minutes) as total_minutes,
-            COUNT(DISTINCT DATE(created_at)) as total_days
+            COUNT(DISTINCT date) as total_days
 
         ')
         ->first();

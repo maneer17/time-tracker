@@ -36,6 +36,7 @@ class AcceptedInvitationNotification extends Notification implements ShouldQueue
         return [
             'invitation_id' => $this->invitation->id,
             'channel_id' => $this->invitation->channel->id,
+            'channel_name'  => $this->invitation->channel->name,
             'from'          => $this->invitation->invitedUser->name,
             'message'       => $this->invitation->invitedUser->name . ' accepted your invitation to ' . $this->invitation->channel->name,
             'type'          => NotificationType::AcceptedInvitations->value,

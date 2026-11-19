@@ -32,7 +32,7 @@ class CommentDeletedByOwnerNotification extends Notification implements ShouldQu
         // extract everything now, while comment still exists in DB
         // the listener is synchronous so this constructor runs before $comment->delete()
         $this->commentId     = $comment->id;
-        $this->fromName      = $comment->author->name;
+        $this->fromName      = $comment->sharedDay->channel->owner->name; // the owner who deleted it
         $this->channelId     = $comment->sharedDay->channel->id;
         $this->channelName   = $comment->sharedDay->channel->name;
         $this->sharedDayDate = $comment->sharedDay->date->format('Y-m-d');
@@ -50,6 +50,9 @@ class CommentDeletedByOwnerNotification extends Notification implements ShouldQu
             'comment_id' => $this->commentId,
             'from'       => $this->fromName,
             'channel_id' => $this->channelId,
+            'channel_name'    => $this->channelName,
+            'shared_day_date' => $this->sharedDayDate,
+            'excerpt'         => Str::limit($this->commentBody, 50),
             'message'    => 'Your comment: ' . Str::limit($this->commentBody, 50) .
                             ' on shared day ' . $this->sharedDayDate .
                             ' for the channel ' . $this->channelName .

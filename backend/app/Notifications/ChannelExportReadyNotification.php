@@ -40,6 +40,7 @@ class ChannelExportReadyNotification extends Notification implements ShouldQueue
     {
         return [
             'channel_id'   => $this->channel->id,
+            'channel_name' => $this->channel->name,
             'message'      => 'Your export for ' . $this->channel->name . ' is ready.',
             'download_url' => $this->downloadUrl(),
             'type'         => NotificationType::ChannelExportReady->value,

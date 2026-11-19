@@ -27,17 +27,21 @@ export const useAuthStore = defineStore('authStore', {
   }
 },
 async googleLogin(googleToken) {
-    const { data } = await apiClient.post('/api/auth/google', {
-        token: googleToken  // now an access token instead of ID token
-    })
+    try {
+        const { data } = await apiClient.post('/api/auth/google', {
+            token: googleToken  // now an access token instead of ID token
+        })
 
-    this.token = data.token
-    this.user = data.user
-    this.isAuthenticated = true
-    localStorage.setItem('token', data.token)
+        this.token = data.token
+        this.user = data.user
+        this.isAuthenticated = true
+        localStorage.setItem('token', data.token)
 
-    router.push({ name: 'Home' })
-    return { success: true }
+        router.push({ name: 'Home' })
+        return { success: true }
+    } catch (error) {
+        return { success: false }
+    }
 }
 ,
     
@@ -58,19 +62,24 @@ async googleLogin(googleToken) {
       }
     },
     
-   async logout() {
-     try {
+    // Forget the session locally. Used by logout, by checkAuth and by the 401 handler.
+    clearSession() {
+      this.user = null;
+      this.token = null;
+      this.isAuthenticated = false;
+      localStorage.removeItem('token');
+    },
+
+    async logout() {
+      try {
         await apiClient.post('/api/logout');
-        this.user = null;
-        this.token = null;
-        this.isAuthenticated = false;
-        localStorage.removeItem('token');
-        router.push('/login');
-        return { success: true };
-        
       } catch (error) {
-          return {success: false}
+        // Even if the server can't be reached (or the token already expired),
+        // the user asked to leave: never leave them stuck in a "logged in" state.
       }
+      this.clearSession();
+      router.push('/login');
+      return { success: true };
     },
     
     async checkAuth() {
@@ -80,10 +89,7 @@ async googleLogin(googleToken) {
           this.user = response.data;
           this.isAuthenticated = true;
         } catch (error) {
-          this.user = null;
-          this.token = null;
-          this.isAuthenticated = false;
-          localStorage.removeItem('token');
+          this.clearSession();
         }
       }
     }
