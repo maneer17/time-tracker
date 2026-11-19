@@ -24,11 +24,10 @@ const refreshPage = () => {
 </script>
 
 <template>
-    <div class="max-w-3xl mx-auto py-6">
+    <div>
 
-        <div v-if="error" class="flex items-center gap-3 p-4 bg-red-50 text-red-700 rounded-2xl border border-red-100 shadow-sm">
-            <span class="text-xl">⚠️</span>
-            <p class="font-medium text-sm">{{ error }}</p>
+        <div v-if="error" class="p-4 bg-[#FEE2E2] text-[#991B1B] rounded-3xl border border-[#FECACA] text-sm font-medium">
+            {{ error }}
         </div>
 
         <div v-else-if="data" class="space-y-4">
@@ -39,20 +38,20 @@ const refreshPage = () => {
                     :day="sharedDay"
                     @deleted="refreshPage" />
             </div>
-            <AppPagination 
-                v-if="paginatorData?.meta" 
-                :data="paginatorData" 
-                @page-change="goToPage" />
 
-            <div v-else class="flex flex-col items-center justify-center py-20 bg-gray-50/50 border-2 border-dashed border-gray-200 rounded-3xl">
-                <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-2xl mb-4">📅</div>
-                <h3 class="text-gray-900 font-bold">{{ t('channel_shared_days.empty_title') }}</h3>
-                <p class="text-gray-400 text-sm mt-1">{{ t('channel_shared_days.empty_message') }}</p>
+            <div v-else class="flex flex-col items-center justify-center py-16 bg-white border border-dashed border-[#D9D4CE] rounded-3xl text-center px-6">
+                <h3 class="font-semibold">{{ t('channel_shared_days.empty_title') }}</h3>
+                <p class="text-[#5F7480] text-sm mt-1">{{ t('channel_shared_days.empty_message') }}</p>
             </div>
+
+            <AppPagination
+                v-if="data.length > 0 && paginatorData?.meta"
+                :data="paginatorData"
+                @page-change="goToPage" />
         </div>
 
         <div v-else class="space-y-4">
-            <div v-for="i in 3" :key="i" class="h-20 bg-gray-100 rounded-2xl animate-pulse"></div>
+            <div v-for="i in 3" :key="i" class="h-20 bg-[#EFECE8] rounded-3xl animate-pulse"></div>
         </div>
 
     </div>

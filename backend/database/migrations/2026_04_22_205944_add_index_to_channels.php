@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('channels', function (Blueprint $table) {
-            $table->index('user_id', 'idx_user_id');
-            $table->index('created_at', 'idx_created_at');
+            $table->index('user_id', 'idx_channels_user_id');
+            $table->index('created_at', 'idx_channels_created_at');
         });
     }
 
@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('channels', function (Blueprint $table) {
-            $table->dropIndex('idx_user_id');
-            $table->dropIndex('idx_created_at');
+            $table->dropIndex('idx_channels_user_id');
+            $table->dropIndex('idx_channels_created_at');
         });
     }
 };

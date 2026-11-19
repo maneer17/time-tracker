@@ -3,6 +3,8 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useNotificationStore } from '@/stores/notificationStore'
 import NotificationDropdown from './NotificationDropdown.vue'
 
+// align: which edge of the bell the dropdown lines up with ('end' for a bar, 'start' inside the side navigation)
+const props = defineProps({ align: { type: String, default: 'end' } })
 const notificationStore = useNotificationStore()
 
 const isOpen = ref(false)
@@ -35,13 +37,13 @@ onUnmounted(() => {
         <!-- Bell Button -->
         <button
             @click.stop="toggleDropdown"
-            class="relative p-2.5 rounded-2xl transition-all duration-200 hover:bg-[#F0F4F8] active:scale-95"
-            :class="{ 'bg-[#F0F4F8]': isOpen }"
+            class="relative p-2.5 rounded-2xl transition-all duration-200 hover:bg-[#EFECE8] active:scale-95"
+            :class="{ 'bg-[#EFECE8]': isOpen }"
         >
             <!-- Bell Icon -->
             <svg
                 class="w-5 h-5 transition-colors"
-                :class="unreadCount > 0 ? 'text-[#5A7D5A]' : 'text-[#8E9AAF]'"
+                :class="unreadCount > 0 ? 'text-[#083A4F]' : 'text-[#5F7480]'"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -58,7 +60,7 @@ onUnmounted(() => {
             <transition name="badge">
                 <span
                     v-if="unreadCount > 0"
-                    class="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-[#AF4E4E] text-white text-[10px] font-bold rounded-full px-1 shadow-sm"
+                    class="absolute -top-1 -end-1 min-w-[18px] h-[18px] flex items-center justify-center bg-[#991B1B] text-white text-[10px] font-bold rounded-full px-1 shadow-sm"
                 >
                     {{ unreadCount > 99 ? '99+' : unreadCount }}
                 </span>
@@ -69,7 +71,7 @@ onUnmounted(() => {
         <transition name="dropdown">
             <div
                 v-if="isOpen"
-                class="absolute right-0 top-full mt-3 z-50"
+                :class="[props.align === 'start' ? 'start-0' : 'end-0', 'absolute top-full mt-3 z-50']"
                 @click.stop
             >
                 <NotificationDropdown />

@@ -40,11 +40,15 @@ class TimeEntryController extends Controller
 
     public function show(TimeEntry $time_entry)
     {
+        $this->authorize('view', $time_entry);
+
         return new TimeEntryResource($time_entry);
     }
 
     public function update(UpdateTimeEntryRequest $request, TimeEntry $time_entry)
     {
+        $this->authorize('update', $time_entry);
+
         $validated = $request->validated();
         $time_entry->update($validated);
         return new TimeEntryResource($time_entry);
@@ -52,6 +56,8 @@ class TimeEntryController extends Controller
 
     public function destroy(TimeEntry $time_entry)
     {
+        $this->authorize('delete', $time_entry);
+
         $time_entry->delete();
         return new TimeEntryResource($time_entry);
     }

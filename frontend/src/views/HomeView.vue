@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, provide } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useLocaleFormat } from '@/composables/useLocaleFormat'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { usePagination } from '@/composables/usePagination'
@@ -8,9 +9,12 @@ import timeEntryService from '@/services/timeEntryService'
 import HistorySidebar from '@/components/history/HistorySidebar.vue'
 import ShareDayModal from '@/components/time-entries/ShareDayModal.vue'
 import TimeEntryList from '@/components/time-entries/TimeEntryList.vue'
+import QuickLogForm from '@/components/time-entries/QuickLogForm.vue'
+import ExportPanel from '@/components/time-entries/ExportPanel.vue'
 import AppPagination from '@/components/AppPagination.vue'
 
 const { t } = useI18n()
+const { formatDate } = useLocaleFormat()
 const router = useRouter()
 const toast = useToast()
 
@@ -26,13 +30,9 @@ watch(filters, () => refresh(), { deep: true })
 provide('refreshEntries', refresh)
 
 const title = ref(t('home.today_entries'))
-const showHistory = ref(false)
+const showExportPanel = ref(false)
 const showShareModal = ref(false)
 const selectedShareDate = ref(null)
-
-const historyButtonText = computed(() =>
-    showHistory.value ? `← ${t('home.hide')}` : `${t('home.history')} →`
-)
 
 const totalMinutes = computed(() => {
     if (!entries.value?.length) return 0
@@ -41,17 +41,22 @@ const totalMinutes = computed(() => {
     )
 })
 
+const totalLabel = computed(() =>
+    `${Math.floor(totalMinutes.value / 60)}${t('units.hours_short')} ${String(totalMinutes.value % 60).padStart(2, '0')}${t('units.minutes_short')}`
+)
+
+// The server decides what "today" is in UTC, so the share button asks for the same day.
+const todayIso = () => new Date().toISOString().slice(0, 10)
+
 const goToDate = (date) => {
     filters.value.date = date
-    title.value = `${t('home.entries_of')} ${date}`
+    title.value = `${t('home.entries_of')} ${formatDate(date, { day: 'numeric', month: 'long', year: 'numeric' })}`
 }
 
 const todayEntries = () => {
     filters.value = { search: '', date: null, sort: '' }
     title.value = t('home.today_entries')
 }
-
-const toggleHistory = () => showHistory.value = !showHistory.value
 
 const handleShareDate = (date) => {
     selectedShareDate.value = date
@@ -60,123 +65,114 @@ const handleShareDate = (date) => {
 
 const handleShared = () => {
     showShareModal.value = false
-    toast.success('Day shared successfully!')
+    toast.success(t('share_day.shared_success'))
     router.push({ name: 'MySharedDays' })
 }
+
+const shareCurrentDay = () => handleShareDate(filters.value.date ?? todayIso())
 </script>
 
 <template>
-    <div class="flex min-h-screen bg-[#F9F7F2] relative font-sans text-[#4A4A4A]">
+    <div class="min-h-screen flex flex-col">
 
-        <div class="flex-1 p-10 transition-all duration-500" :class="{ 'mr-[320px]': showHistory }">
-
-            <div class="flex gap-4 mb-10 flex-wrap items-center">
-                <input
-                    v-model="filters.search"
-                    type="text"
-                    :placeholder="t('home.search_placeholder')"
-                    class="px-5 py-3 bg-white border-none rounded-2xl shadow-sm text-[0.95rem] focus:ring-2 focus:ring-[#D4E2D4] outline-none w-64 transition-all" />
-
-                <select
-                    v-model="filters.sort"
-                    class="px-5 py-3 bg-white border-none rounded-2xl shadow-sm text-[0.95rem] cursor-pointer focus:ring-2 focus:ring-[#D4E2D4] outline-none transition-all">
-                    <option value="">{{ t('home.sort_default') }}</option>
-                    <option value="desc">{{ t('home.sort_oldest') }}</option>
-                    <option value="asc">{{ t('home.sort_latest') }}</option>
-                </select>
-
-                <button
-                    @click="todayEntries"
-                    class="px-6 py-3 bg-[#E8F0E8] text-[#5A7D5A] font-semibold rounded-2xl hover:bg-[#D4E2D4] transition-all duration-300 shadow-sm">
-                    {{ t('home.today_entries') }}
-                </button>
-
-                <button
-                    @click="toggleHistory"
-                    class="ml-auto px-6 py-3 bg-white text-[#8A8A8A] font-medium rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-                    {{ historyButtonText }}
-                </button>
+        <!-- Page header -->
+        <header class="bg-white border-b border-[#D9D4CE] px-4 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <h1 class="text-2xl lg:text-3xl font-bold tracking-tight truncate">{{ title }}</h1>
+                <span class="inline-flex px-2.5 py-1 rounded-full bg-[#C0D5D6] text-[#083A4F] text-xs font-semibold tabular-nums whitespace-nowrap">{{ totalLabel }}</span>
             </div>
 
-            <!-- Error -->
-            <div v-if="error" class="p-6 bg-[#FFF2F2] text-[#AF4E4E] rounded-[2rem] border border-[#FFDADA]">
-                {{ t('home.error') }}: {{ error }}
+            <div class="flex items-center gap-2">
+                <button
+                    @click="shareCurrentDay"
+                    :disabled="!entries.length"
+                    class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#083A4F] text-white text-sm font-medium hover:bg-[#407E8C] transition-colors disabled:bg-[#C0D5D6] disabled:text-[#3E5660] disabled:cursor-not-allowed">
+                    <!-- box with an arrow leaving it: the usual "share / send out" symbol -->
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 8H7.5A2.25 2.25 0 005.25 10.25v8.25A2.25 2.25 0 007.5 20.75h9a2.25 2.25 0 002.25-2.25v-8.25A2.25 2.25 0 0016.5 8H15m-3-5.25L9 5.75m3-3l3 3m-3-3v11.5" /></svg>
+                    {{ t('home.share_day') }}
+                </button>
+                <button
+                    @click="showExportPanel = !showExportPanel"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-[#3E5660] hover:bg-[#EFECE8] hover:text-[#083A4F] transition-colors"
+                    :class="{ 'bg-[#EFECE8] text-[#083A4F]': showExportPanel }">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    {{ t('export.button') }}
+                </button>
             </div>
+        </header>
 
-            <template v-else>
+        <div class="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_280px]">
 
-                <!-- Loading (only on first load, not on page change) -->
-                <div v-if="loading && !entries.length" class="flex flex-col items-center justify-center py-20 text-[#BCBCBC]">
-                    <div class="w-12 h-12 border-4 border-[#E8F0E8] border-t-[#5A7D5A] rounded-full animate-spin mb-4"></div>
-                    <p class="font-medium">{{ t('home.loading') }}</p>
+            <!-- Main column (below the history strip on small screens) -->
+            <section class="order-2 lg:order-1 p-4 lg:p-8 flex flex-col gap-6 min-w-0">
+
+                <ExportPanel v-if="showExportPanel" />
+
+                <QuickLogForm @created="refresh" />
+
+                <!-- Search, count and sort -->
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <input
+                        v-model="filters.search"
+                        type="search"
+                        :placeholder="t('home.search_placeholder')"
+                        class="flex-1 min-w-[200px] max-w-md rounded-xl border border-[#C0D5D6] bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-[#083A4F] focus:ring-2 focus:ring-[#083A4F]/15" />
+
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-[#5F7480] tabular-nums">{{ t('home.entries_count', entries.length) }}</span>
+
+                        <select
+                            v-model="filters.sort"
+                            class="rounded-xl border border-[#C0D5D6] bg-white px-3 py-2.5 text-sm cursor-pointer focus:outline-none focus:border-[#083A4F] focus:ring-2 focus:ring-[#083A4F]/15">
+                            <option value="">{{ t('home.sort_default') }}</option>
+                            <option value="desc">{{ t('home.sort_oldest') }}</option>
+                            <option value="asc">{{ t('home.sort_latest') }}</option>
+                        </select>
+
+                        <button
+                            @click="todayEntries"
+                            class="px-4 py-2.5 rounded-xl bg-[#C0D5D6] text-[#083A4F] text-sm font-medium hover:bg-[#A9C4C6] transition-colors whitespace-nowrap">
+                            {{ t('home.today_entries') }}
+                        </button>
+                    </div>
                 </div>
 
-                <div v-else class="space-y-8">
+                <!-- Error -->
+                <div v-if="error" class="p-5 bg-[#FEE2E2] text-[#991B1B] rounded-3xl border border-[#FECACA]">
+                    {{ t('home.error') }}: {{ error }}
+                </div>
 
-                    <h2 class="text-3xl font-bold text-[#333] tracking-tight">{{ title }}</h2>
-
-                    <!-- Stats -->
-                    <div v-if="entries.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="p-6 bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 hover:translate-y-[-4px] transition-transform duration-300">
-                            <p class="text-[0.7rem] font-bold text-[#A0A0A0] uppercase tracking-[0.1em] mb-2">
-                                {{ t('home.total_time') }}
-                            </p>
-                            <p class="text-3xl font-bold text-[#333]">
-                                {{ Math.floor(totalMinutes / 60) }}<span class="text-lg font-medium text-[#A0A0A0]">h</span>
-                                {{ totalMinutes % 60 }}<span class="text-lg font-medium text-[#A0A0A0]">m</span>
-                            </p>
-                        </div>
-
-                        <div class="p-6 bg-[#F0F4F8] rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 hover:translate-y-[-4px] transition-transform duration-300">
-                            <p class="text-[0.7rem] font-bold text-[#8E9AAF] uppercase tracking-[0.1em] mb-2">
-                                {{ t('home.total_entries') }}
-                            </p>
-                            <p class="text-3xl font-bold text-[#333]">{{ entries.length }}</p>
-                        </div>
-
-                        <div class="p-6 bg-[#FEF6E4] rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 hover:translate-y-[-4px] transition-transform duration-300">
-                            <p class="text-[0.7rem] font-bold text-[#D4A373] uppercase tracking-[0.1em] mb-2">
-                                {{ t('home.avg_per_entry') }}
-                            </p>
-                            <p class="text-3xl font-bold text-[#333]">
-                                {{ Math.floor(totalMinutes / entries.length / 60) }}<span class="text-lg font-medium text-[#A0A0A0]">h</span>
-                                {{ Math.floor(totalMinutes / entries.length) % 60 }}<span class="text-lg font-medium text-[#A0A0A0]">m</span>
-                            </p>
-                        </div>
+                <template v-else>
+                    <!-- Loading (only on first load, not on page change) -->
+                    <div v-if="loading && !entries.length" class="flex flex-col items-center justify-center py-16 text-[#5F7480]">
+                        <div class="w-10 h-10 border-4 border-[#C0D5D6] border-t-[#083A4F] rounded-full animate-spin mb-3"></div>
+                        <p class="font-medium">{{ t('home.loading') }}</p>
                     </div>
 
-                    <!-- Empty -->
-                    <div v-else class="p-4 text-[#999] text-center">
+                    <div v-else-if="!entries.length" class="p-8 text-[#5F7480] text-center bg-white border border-dashed border-[#D9D4CE] rounded-3xl">
                         {{ t('home.no_entries') }}
                     </div>
 
-                    <!-- List -->
-                    <div class="bg-white/40 p-2 rounded-[2.5rem]">
-                        <TimeEntryList :entries="entries" />
-                    </div>
+                    <TimeEntryList v-else :entries="entries" />
 
-                    <!-- Pagination -->
-                    <AppPagination 
-                    v-if="paginatorData.meta" 
-                    :data="paginatorData" 
-                    @page-change="goToPage" />
+                    <AppPagination
+                        v-if="paginatorData?.meta"
+                        :data="paginatorData"
+                        @page-change="goToPage" />
+                </template>
+            </section>
 
-                </div>
-
-            </template>
-
+            <HistorySidebar
+                class="order-1 lg:order-2"
+                :active-date="filters.date ?? todayIso()"
+                @select-date="goToDate"
+                @share-date="handleShareDate" />
         </div>
-
-        <HistorySidebar
-            :show="showHistory"
-            @select-date="goToDate"
-            @share-date="handleShareDate" />
 
         <ShareDayModal
             v-if="showShareModal"
             :date="selectedShareDate"
             @close="showShareModal = false"
             @shared="handleShared" />
-
     </div>
 </template>

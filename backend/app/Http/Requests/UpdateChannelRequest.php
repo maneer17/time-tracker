@@ -11,7 +11,7 @@ class UpdateChannelRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,8 @@ class UpdateChannelRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => "sometimes|max:255",
+            "name" => "sometimes|required|max:255",
+            "description" => "sometimes|nullable|string|max:1000",
         ];
     }
 }

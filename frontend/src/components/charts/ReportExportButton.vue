@@ -59,28 +59,16 @@ watch(() => props.capturedCharts, (charts) => {
         <button
             @click="handleExport"
             :disabled="loading"
-            class="px-8 py-3 bg-white border-2 border-[#E07A5F] text-[#E07A5F] 
-                   hover:bg-[#E07A5F] hover:text-white text-[13px] font-black 
-                   uppercase tracking-widest rounded-2xl disabled:opacity-50 
-                   transition shadow-sm active:scale-95">
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#C0D5D6] text-sm font-medium text-[#083A4F] hover:bg-[#EFECE8] transition-colors disabled:opacity-50">
 
-            <span v-if="!loading">
-                📄 Export PDF
-            </span>
-
-            <span v-else class="flex items-center gap-2">
-                <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                    fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10"
-                        stroke="currentColor" stroke-width="4" />
-                    <path class="opacity-75" fill="currentColor"
-                        d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
-                Exporting...
-            </span>
-
+            <svg v-if="!loading" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            <svg v-else class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+            </svg>
+            {{ loading ? $t('export.exporting') : $t('export.pdf_button') }}
         </button>
 
-        <p v-if="error" class="text-xs text-[#AF4E4E] mt-2">{{ error }}</p>
+        <p v-if="error" class="text-xs text-[#991B1B] mt-2">{{ error }}</p>
     </div>
 </template>

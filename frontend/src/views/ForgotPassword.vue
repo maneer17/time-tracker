@@ -29,31 +29,31 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-    <div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div class="w-full max-w-md p-8 bg-white rounded-2xl shadow-lg border border-gray-100">
+    <div class="min-h-screen flex items-center justify-center paper-bg px-4">
+        <div class="w-full max-w-md p-8">
 
             <Transition name="fade" mode="out-in">
 
                 <div v-if="submitted" class="text-center space-y-4 py-4">
-                    <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                        <svg class="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="w-14 h-14 bg-[#C0D5D6] rounded-full flex items-center justify-center mx-auto">
+                        <svg class="w-7 h-7 text-[#083A4F]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
 
-                    <h2 class="text-2xl font-bold text-gray-800">
+                    <h2 class="text-2xl font-semibold tracking-tight text-[#083A4F]">
                         {{ t('passwords.forgotPassword.checkEmail') }}
                     </h2>
 
-                    <p class="text-sm text-gray-500">
+                    <p class="text-sm text-[#3E5660]">
                         {{ message.message }}
                     </p>
 
-                    <p class="text-xs text-gray-400 pt-2">
+                    <p class="text-xs text-[#5F7480] pt-2">
                         {{ t('passwords.forgotPassword.didntReceive') }}
                         <button
                             @click="submitted = false; clicked = false"
-                            class="text-blue-600 hover:underline font-medium"
+                            class="text-[#407E8C] hover:underline font-medium"
                         >
                             {{ t('passwords.forgotPassword.tryAgain') }}
                         </button>
@@ -62,17 +62,17 @@ const handleSubmit = async () => {
 
                 <form v-else @submit.prevent="handleSubmit" class="space-y-6">
                     <div class="text-center">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-2xl font-semibold tracking-tight text-[#083A4F]">
                             {{ t('passwords.forgotPassword.resetPassword') }}
                         </h2>
 
-                        <p class="text-sm text-gray-500 mt-2">
+                        <p class="text-sm text-[#3E5660] mt-2">
                             {{ t('passwords.forgotPassword.enterEmail') }}
                         </p>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-xs font-medium mb-1.5">
                             {{ t('passwords.forgotPassword.emailAddress') }}
                         </label>
 
@@ -80,21 +80,21 @@ const handleSubmit = async () => {
                             v-model="email"
                             type="email"
                             :placeholder="t('passwords.forgotPassword.emailPlaceholder')"
-                            class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all duration-200"
+                            class="w-full px-4 py-3 text-sm border border-[#C0D5D6] rounded-xl focus:ring-2 focus:ring-[#083A4F]/15 focus:border-[#083A4F] outline-none transition-colors"
                         />
                     </div>
 
                     <button
                         type="submit"
                         :disabled="!email || clicked"
-                        class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition-all transform active:scale-[0.98] shadow-md shadow-blue-200"
+                        class="w-full bg-[#083A4F] hover:bg-[#407E8C] disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium py-3 px-4 rounded-full transition-colors"
                     >
                         {{ t('passwords.forgotPassword.sendResetLink') }}
                     </button>
 
                     <div
                         v-if="error"
-                        class="text-sm text-red-700 bg-red-50 p-4 rounded-xl border border-red-200 flex items-center gap-2"
+                        class="text-sm text-[#991B1B] bg-[#FEE2E2] p-4 rounded-xl border border-[#FECACA] flex items-center gap-2"
                     >
                         <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path

@@ -24,34 +24,34 @@ const remove = async () => {
 </script>
 
 <template>
-  <div class="bg-white border border-red-100 rounded-2xl p-6">
-    <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ t('channel.delete_channel') }}</h3>
-    <p class="text-gray-500 text-sm mb-4">{{ t('channel.delete_warning') }}</p>
+  <section class="bg-white border border-[#FECACA] rounded-3xl p-5 sm:p-6">
+    <h3 class="font-semibold mb-1">{{ t('channel.delete_channel') }}</h3>
+    <p class="text-[#5F7480] text-sm mb-4">{{ t('channel.delete_warning') }}</p>
 
     <template v-if="!confirmDelete">
       <button
         @click="confirmDelete = true"
-        class="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium">
+        class="px-4 py-2 bg-[#FEE2E2] text-[#991B1B] rounded-full hover:bg-[#FECACA] transition-colors text-sm font-medium">
         {{ t('channel.delete_channel') }}
       </button>
     </template>
 
     <template v-else>
-      <p class="text-gray-700 text-sm mb-3">{{ t('channel.delete_confirm') }}</p>
+      <p class="text-sm mb-3">{{ t('channel.delete_confirm') }}</p>
       <div class="flex gap-2">
         <button
           @click="remove"
           :disabled="loading"
-          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors text-sm font-medium">
+          class="px-4 py-2 bg-[#991B1B] text-white rounded-full hover:bg-[#7F1D1D] disabled:opacity-50 transition-colors text-sm font-medium">
           {{ loading ? '...' : t('channel.yes') }}
         </button>
         <button
           @click="confirmDelete = false"
           :disabled="loading"
-          class="px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 transition-colors text-sm font-medium">
+          class="px-4 py-2 border border-[#C0D5D6] rounded-full hover:bg-[#EFECE8] disabled:opacity-50 transition-colors text-sm font-medium">
           {{ t('channel.no') }}
         </button>
       </div>
     </template>
-  </div>
+  </section>
 </template>

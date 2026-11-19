@@ -6,6 +6,7 @@ use App\Events\NewSharedDayEvent;
 use App\Models\{Channel, SharedDay};
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSharedDayRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\SharedDayResource;
 
@@ -14,7 +15,7 @@ class SharedDayController extends Controller
     // GET /channels/{channel}/shared-days
     public function index(Channel $channel)
     {
-        $this->authorize('viewAny', $channel);
+        $this->authorize('view', $channel);
 
         return SharedDayResource::collection(
             $channel->sharedDays()->paginate($this->paginate)
@@ -33,8 +34,10 @@ class SharedDayController extends Controller
     public function store(StoreSharedDayRequest $request)
     {
         $sharedDays = collect();
+        // The frontend sends the day as an ISO timestamp; MySQL's date column needs Y-m-d.
+        $date = Carbon::parse($request->date)->toDateString();
 
-        DB::transaction(function () use ($request, &$sharedDays) {
+        DB::transaction(function () use ($request, $date, &$sharedDays) {
             foreach ($request->channel_ids as $channelId) {
                 $channel = Channel::findOrFail($channelId);
                 $this->authorize('create', [SharedDay::class, $channel]);
@@ -42,7 +45,7 @@ class SharedDayController extends Controller
                 $sharedDay = SharedDay::firstOrCreate([
                     'channel_id' => $channelId,
                     'user_id'    => auth()->id(),
-                    'date'       => $request->date,
+                    'date'       => $date,
                 ]);
 
                 foreach ($request->entry_ids as $entryId) {

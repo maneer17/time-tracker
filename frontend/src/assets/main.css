@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+/* Illustrations that dissolve into their surroundings instead of sitting in a box */
+.blend-vignette {
+  /* soft edge on all four sides (for pictures on a tinted panel) */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 16%, #000 84%, transparent), linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 16%, #000 84%, transparent), linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+.blend-bottom {
+  /* picture melts into the surface below it (for pictures on top of a card) */
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent);
+}
+.blend-art {
+  /* paper-white backgrounds take on the page colour, and the edges melt away */
+  mix-blend-mode: multiply;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* The signed-out pages share one warm paper colour, the same as the journal illustration's paper */
+.paper-bg {
+  background: #F9EBD8;
+}

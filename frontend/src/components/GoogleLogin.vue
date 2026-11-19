@@ -21,21 +21,21 @@ const handleGoogleLogin = async () => {
 </script>
 
 <template>
-  <div class="mt-6">
+  <div>
 
-    <div class="relative flex items-center justify-center mb-6">
+    <div class="relative flex items-center justify-center mb-4">
       <div class="absolute inset-0 flex items-center">
-        <div class="w-full border-t border-[#E8E4DC]"></div>
+        <div class="w-full border-t border-[#D9D4CE]"></div>
       </div>
-      <span class="relative bg-[#FDFCFB] px-4 text-[11px] font-black text-[#A0A0A0] uppercase tracking-[0.2em]">
-        or continue with
+      <span class="relative bg-[#F9EBD8] px-3 text-xs text-[#3E5660]">
+        {{ $t('login.or_continue_with') }}
       </span>
     </div>
 
     <button
       @click="handleGoogleLogin"
       type="button"
-      class="w-full flex items-center justify-center gap-3 py-3.5 px-5 bg-[#F9F7F2] border-2 border-transparent rounded-[1.5rem] text-[12px] font-black uppercase tracking-[0.2em] text-[#4A4A4A] transition-all hover:border-[#5A7D5A] hover:bg-white active:scale-[0.98]"
+      class="w-full flex items-center justify-center gap-3 py-3 px-5 bg-white border border-[#C0D5D6] rounded-full text-sm font-medium text-[#083A4F] transition-colors hover:bg-[#FAF9F7]"
     >
       <!-- Google SVG icon -->
       <svg width="18" height="18" viewBox="0 0 48 48">
@@ -45,7 +45,7 @@ const handleGoogleLogin = async () => {
         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
         <path fill="none" d="M0 0h48v48H0z"/>
       </svg>
-      Sign in with Google
+      {{ $t('login.google_sign_in') }}
     </button>
 
   </div>

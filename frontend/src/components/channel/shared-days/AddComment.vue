@@ -27,21 +27,21 @@ const submit = async () => {
 }
 </script>
 <template>
-    <form @submit.prevent="submit" class="flex flex-col gap-4 p-4">
+    <form @submit.prevent="submit" class="flex flex-col gap-3 p-3">
         <textarea
             v-model="formData.body"
             :placeholder="t('comments.placeholder')"
             rows="3"
-            class="w-full px-5 py-4 text-[14px] font-medium text-[#4A4A4A] bg-white border-2 border-[#F9F7F2] rounded-[1.5rem] placeholder-[#A0A0A0] focus:outline-none focus:border-[#5A7D5A] focus:bg-white resize-none transition-all duration-300 shadow-sm" />
+            class="w-full px-4 py-3 text-sm text-[#083A4F] bg-white border border-[#C0D5D6] rounded-xl placeholder-[#5F7480]/70 focus:outline-none focus:border-[#083A4F] focus:ring-2 focus:ring-[#083A4F]/15 resize-none transition-colors" />
 
-        <p v-if="error?.body" class="px-2 text-[11px] font-bold text-[#E07A5F] italic tracking-wide">
+        <p v-if="error?.body" class="px-1 text-xs text-[#991B1B]">
             {{ error.body[0] }}
         </p>
 
         <button
             type="submit"
             :disabled="loading || !formData.body.trim()"
-            class="self-end px-8 py-2.5 bg-[#5A7D5A] hover:bg-[#4A6D4A] text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-xl disabled:opacity-40 disabled:grayscale transition-all shadow-lg shadow-[#5A7D5A]/10 active:scale-95">
+            class="self-end px-5 py-2 bg-[#083A4F] hover:bg-[#407E8C] text-white text-sm font-medium rounded-full disabled:opacity-40 transition-colors">
             {{ loading ? t('comments.submitting') : t('comments.submit') }}
         </button>
     </form>

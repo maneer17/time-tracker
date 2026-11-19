@@ -41,19 +41,19 @@ const displayUser = props.mode === 'received'
 </script>
 
 <template>
-    <div class="flex items-center justify-between p-6 bg-white border-2 border-[#F9F7F2] border-dashed rounded-[2rem] transition-all hover:bg-[#FDFCFB]">
+    <div class="flex items-center justify-between p-6 bg-white border border-[#FAF9F7] border-dashed rounded-3xl transition-all hover:bg-[#FAF9F7]">
 
         <div class="flex items-center gap-4">
-            <div class="h-10 w-10 rounded-xl bg-[#F2E9E4] flex items-center justify-center text-[#D4A373] font-black text-sm uppercase">
+            <div class="h-10 w-10 rounded-xl bg-[#F3EEE4] flex items-center justify-center text-[#A58D66] font-semibold text-sm">
                 {{ displayUser.name.charAt(0) }}
             </div>
 
             <div class="flex flex-col gap-0.5">
-                <span class="font-black text-[#4A4A4A] tracking-tight leading-none">{{ displayUser.name }}</span>
-                <span class="text-[10px] font-black text-[#A0A0A0] uppercase tracking-widest mt-1">{{ displayUser.email }}</span>
+                <span class="font-semibold text-[#083A4F] tracking-tight leading-none">{{ displayUser.name }}</span>
+                <span class="text-xs font-semibold text-[#5F7480] mt-1">{{ displayUser.email }}</span>
                 <div class="flex items-center gap-1.5 mt-2">
-                    <span class="w-1 h-1 rounded-full bg-[#5A7D5A]"></span>
-                    <span class="text-[10px] font-bold text-[#5A7D5A] uppercase tracking-tighter">{{ invitation.channel.name }}</span>
+                    <span class="w-1 h-1 rounded-full bg-[#083A4F]"></span>
+                    <span class="text-xs font-bold text-[#083A4F]">{{ invitation.channel.name }}</span>
                 </div>
             </div>
         </div>
@@ -63,7 +63,7 @@ const displayUser = props.mode === 'received'
                 v-if="mode === 'sent'"
                 @click="cancel"
                 :disabled="cancelLoading"
-                class="px-4 py-2 text-[10px] font-black text-[#E07A5F] hover:bg-[#FFF2F0] rounded-full uppercase tracking-widest disabled:opacity-50 transition-all border border-transparent hover:border-[#FFE5E0]">
+                class="px-4 py-2 text-xs font-semibold text-[#991B1B] hover:bg-[#FEE2E2] rounded-full disabled:opacity-50 transition-all border border-transparent hover:border-[#FECACA]">
                 {{ cancelLoading ? '...' : t('invitation_card.cancel') }}
             </button>
 
@@ -71,13 +71,13 @@ const displayUser = props.mode === 'received'
                 <button
                     @click="accept"
                     :disabled="acceptLoading"
-                    class="px-5 py-2 text-[10px] font-black text-white bg-[#5A7D5A] hover:bg-[#4a6b4a] rounded-full uppercase tracking-widest shadow-lg shadow-[#5A7D5A]/20 transition-all active:scale-95 disabled:opacity-50">
+                    class="px-5 py-2 text-xs font-semibold text-white bg-[#083A4F] hover:bg-[#407E8C] rounded-full transition-all active:scale-95 disabled:opacity-50">
                     {{ acceptLoading ? '...' : t('invitation_card.accept') }}
                 </button>
                 <button
                     @click="decline"
                     :disabled="declineLoading"
-                    class="px-4 py-2 text-[10px] font-black text-[#E07A5F] hover:bg-[#FFF2F0] rounded-full uppercase tracking-widest disabled:opacity-50 transition-all border border-transparent hover:border-[#FFE5E0]">
+                    class="px-4 py-2 text-xs font-semibold text-[#991B1B] hover:bg-[#FEE2E2] rounded-full disabled:opacity-50 transition-all border border-transparent hover:border-[#FECACA]">
                     {{ declineLoading ? '...' : t('invitation_card.decline') }}
                 </button>
             </template>

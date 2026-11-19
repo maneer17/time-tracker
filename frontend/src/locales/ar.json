@@ -1,27 +1,6 @@
 {
     "message": {
-        "hello": "مرحبا",
-        "hide_history": "اخفاء",
-        "add_entry": "أضف نشاط جديد"
-    },
-    "login": {
-        "welcome_back": "أهلا بعودتك",
-        "email": "الايميل",
-        "password": "كلمة المرور",
-        "login": "تسجيل الدخول",
-        "dont_have_account": "لا تملك حساب ؟",
-        "sign_up_here": "أنشئ حساب هنا",
-        "forgot_password": "هل نسيت كلمة السر؟"
-    },
-    "register": {
-        "create_account": "أنشئ حساب",
-        "name": "الاسم",
-        "email": "الايميل",
-        "password": "كلمة المرور",
-        "confirm_password": "تأكيد كلمة المرور",
-        "sign_up": "أنشئ حساب",
-        "you_already_have_account": "لديك حساب؟",
-        "login": "سجل الدخول"
+        "session_expired": "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى."
     },
     "about": {
         "title": "عن الموقع",
@@ -32,7 +11,6 @@
     "nav": {
         "home": "الصفحة الرئيسية",
         "about": "عن الموقع",
-        "add": "أضف نشاط",
         "sign_out": "تسجيل الخروج",
         "channels": "القنوات",
         "shared_days": "الأيام المشتركة",
@@ -46,14 +24,25 @@
         "description": "اختر الإشعارات التي تريد استلامها",
         "saveButton": "حفظ التغييرات",
         "saving": "جاري الحفظ...",
-        "fetchError": "فشل تحميل التفضيلات. يرجى المحاولة مجدداً."
+        "fetchError": "فشل تحميل التفضيلات. يرجى المحاولة مجدداً.",
+        "types": {
+            "channel_invitations": "دعوات القنوات",
+            "accepted_invitations": "الدعوات المقبولة",
+            "new_shared_days": "الأيام المشتركة الجديدة",
+            "new_comments": "التعليقات الجديدة",
+            "comment_deleted_by_owner": "التعليقات التي حذفها المالك",
+            "channel_export_ready": "جاهزية تصدير القناة"
+        }
     }
 },
     "addForm": {
         "label": "العنوان",
         "start_time": "وقت البدء",
         "end_time": "وقت الانتهاء",
-        "add_entry": "أضف النشاط"
+        "add_entry": "أضف النشاط",
+        "loading": "جاري الإضافة...",
+        "subtitle": "سجّل نشاطك لهذا اليوم",
+        "label_placeholder": "على ماذا تعمل؟"
     },
     "home": {
         "history": "السجل",
@@ -65,21 +54,32 @@
          "total_time": "إجمالي الوقت",
         "total_entries": "النشاطات",
         "avg_per_entry": "المتوسط لكل نشاط",
-        "load_more": "تحميل المزيد",
         "loading": "جاري التحميل...",
         "error_loading_dates": "خطأ في تحميل التواريخ",
         "no_dates": "لا توجد تواريخ متاحة",
         "search_placeholder": "بحث...",
         "sort_default": "افتراضي",
         "sort_oldest": "الأقدم",
-        "sort_latest": "الأحدث"
+        "sort_latest": "الأحدث",
+        "no_entries": "لا توجد نشاطات لهذا اليوم بعد.",
+        "entries_count": "لا توجد إدخالات | إدخال واحد | إدخالان | {n} إدخالات | {n} إدخالًا | {n} إدخال",
+        "log_time_entry": "تسجيل وقت جديد",
+        "duration": "المدة: {value}",
+        "invalid_range": "يجب أن يكون وقت النهاية بعد وقت البداية",
+        "col_label": "العنوان",
+        "col_time": "الفترة",
+        "col_duration": "المدة",
+        "col_actions": "إجراءات",
+        "share_day": "مشاركة اليوم"
     },
     "single_entry": {
-        "hour": "صفر ساعات | {n} ساعة | {n} ساعات",
-        "minute": "صفر دقائق | {n} دقيقة | {n} دقائق",
+        "hour": "0 ساعة | ساعة واحدة | ساعتان | {n} ساعات | {n} ساعة | {n} ساعة",
+        "minute": "0 دقيقة | دقيقة واحدة | دقيقتان | {n} دقائق | {n} دقيقة | {n} دقيقة",
         "confirm_delete": "هل أنت متأكد؟",
         "yes": "نعم",
-        "no": "لا"
+        "no": "لا",
+        "edit": "تعديل الإدخال",
+        "delete": "حذف الإدخال"
     },
 "update": {
     "label": "العنوان",
@@ -97,31 +97,33 @@
         "member_of": "عضو في",
         "no_owned": "ليس لديك أي قنوات بعد.",
         "no_joined": "لست عضواً في أي قناة بعد.",
-        "loading": "جاري التحميل...",
         "error": "حدث خطأ ما",
-        "delete_confirm": "هل أنت متأكد أنك تريد حذف هذه القناة؟",
-        "create_first": "أنشئ قناتك الأولى"
+        "create_first": "أنشئ قناتك الأولى",
+        "subtitle": "أدِر مراكز التواصل ومساحات العمل الخاصة بك."
     },
     "create_channel": {
         "title": "إنشاء قناة",
         "name": "الاسم",
         "description": "الوصف",
         "submit": "إنشاء القناة",
-        "loading": "جاري التحميل..."
+        "loading": "جاري التحميل...",
+        "subtitle": "أنشئ مساحة جديدة لمشاريعك",
+        "name_placeholder": "مثال: فريق التصميم",
+        "description_placeholder": "ما الغرض من هذه القناة؟"
     },
     "channel": {
         "overview": "نظرة عامة",
         "members": "الأعضاء",
         "shared_days": "الأيام المشتركة",
         "settings": "الإعدادات",
-        "coming_soon": "قريباً...",
         "delete_channel": "حذف القناة",
         "delete_warning": "هذا الإجراء دائم ولا يمكن التراجع عنه.",
         "delete_confirm": "هل أنت متأكد أنك تريد حذف هذه القناة؟",
         "yes": "نعم، احذف",
         "no": "إلغاء",
         "loading": "جاري التحميل...",
-        "error": "حدث خطأ ما"
+        "error": "حدث خطأ ما",
+        "alert_title": "تنبيه النظام"
     },
     "channel_members": {
         "community": "المجتمع",
@@ -129,14 +131,15 @@
         "active_members": "الأعضاء النشطون",
         "pending_invitations": "الدعوات المعلقة",
         "invite_member": "دعوة عضو",
-        "no_pending": "لا توجد دعوات معلقة."
+        "no_pending": "لا توجد دعوات معلّقة."
     },
     "invite_modal": {
         "title": "دعوة إلى القناة",
         "search_placeholder": "ابحث بالاسم أو البريد الإلكتروني",
         "cancel": "إلغاء",
         "send": "إرسال الدعوة",
-        "sending": "جاري الإرسال..."
+        "sending": "جاري الإرسال...",
+        "search_label": "ابحث عن عضو"
     },
     "channel_overview": {
         "created": "تم الإنشاء",
@@ -145,8 +148,8 @@
     },
     "channel_card": {
         "no_description": "لا يوجد وصف لهذه القناة.",
-        "members": "أعضاء",
-        "enter": "دخول"
+        "enter": "دخول",
+        "workspace": "مساحة عمل"
     },
     "invitation_card": {
         "cancel": "إلغاء",
@@ -163,8 +166,6 @@
         "title": "مشاركة النشاط",
         "entries_title": "اختر النشاطات التي تريد مشاركتها",
         "channels_title": "شارك إلى القنوات",
-        "loading_entries": "جاري تحميل النشاطات...",
-        "loading_channels": "جاري تحميل القنوات...",
         "error_entries": "فشل تحميل النشاطات. يرجى المحاولة مجدداً.",
         "error_channels": "فشل تحميل القنوات. يرجى المحاولة مجدداً.",
         "no_entries": "لا توجد نشاطات لهذا اليوم.",
@@ -174,7 +175,9 @@
         "submit": "شارك اليوم",
         "selected": "محدد",
         "ready": "جاهز للمشاركة؟",
-        "summary": "{entries} نشاط إلى {channels} قنوات"
+        "shared_success": "تمت مشاركة اليوم بنجاح!",
+        "entries_count": "لا نشاطات | نشاط واحد | نشاطان | {n} نشاطات | {n} نشاطاً | {n} نشاط",
+        "channels_count": "لا قنوات | قناة واحدة | قناتان | {n} قنوات | {n} قناة | {n} قناة"
     },
     "shared_day_card": {
         "day": "يوم",
@@ -193,7 +196,8 @@
     },
     "shared_day_view": {
         "summary": "ملخص سجل النشاط",
-        "total_time": "إجمالي الوقت"
+        "total_time": "إجمالي الوقت",
+        "discussion": "النقاش"
     },
     "history_date_item": {
         "share": "مشاركة"
@@ -205,7 +209,6 @@
         "placeholder": "اكتب تعليقاً...",
         "submit": "نشر",
         "submitting": "جاري النشر...",
-        "title": "التعليقات",
         "empty": "لا توجد تعليقات بعد. كن أول من يعلق!",
         "load_more": "تحميل المزيد",
         "show": "إظهار التعليقات",
@@ -213,34 +216,39 @@
     
 },
 "reports": {
-    "title": "إحصائيات القناة",
+    "title": "التقارير",
     "subtitle": "نظرة مفصلة على نشاط مساحة العمل الخاصة بك.",
     "refresh": "تحديث",
     "generate": "إنشاء التقرير",
-    "generating": "جاري الإنشاء...",
     "from": "من",
     "to": "إلى",
-    "empty_state": "لم يتم العثور على مدخلات",
-    "empty_hint": "جرّب اختيار نطاق زمني مختلف.",
     "quick_stats": {
       "title": "إحصائيات سريعة",
       "total_entries": "إجمالي المدخلات",
       "total_time": "إجمالي الوقت",
-      "daily_avg": "المعدل اليومي",
-      "labels_per_day": "تصنيفات يومياً"
+      "daily_avg": "المعدل اليومي"
     },
     "charts": {
       "time_distribution": "توزيع الوقت",
-      "most_used": "التصنيفات الأكثر استخداماً",
-      "avg_per_label": "متوسط الوقت لكل تصنيف"
-    }
+      "most_used": "التصنيفات الأكثر استخداماً"
+    },
+    "minutes": "دقائق",
+    "active_days": "أيام النشاط",
+    "labels_count": "لا توجد تصنيفات | تصنيف واحد | تصنيفان | {n} تصنيفات | {n} تصنيفًا | {n} تصنيف",
+    "labels_per_day": "{n} تصنيفات في اليوم بالمتوسط",
+    "table_title": "الوقت حسب التصنيف",
+    "col_label": "التصنيف",
+    "col_avg": "المتوسط / إدخال",
+    "col_total": "إجمالي الوقت",
+    "col_share": "النسبة",
+    "range": "{from} – {to}"
   },
     "passwords": {
         "forgotPassword": {
             "resetPassword": "إعادة تعيين كلمة المرور",
             "enterEmail": "أدخل بريدك الإلكتروني لاستلام رابط الاسترداد",
             "emailAddress": "البريد الإلكتروني",
-            "emailPlaceholder": "name@company.com",
+            "emailPlaceholder": "name{'@'}company.com",
             "sendResetLink": "إرسال رابط إعادة التعيين",
             "checkEmail": "تحقق من بريدك الإلكتروني",
             "didntReceive": "لم تستلم الرسالة؟ تحقق من مجلد الرسائل غير المرغوب فيها أو",
@@ -257,5 +265,123 @@
             "passwordReset": "تمت إعادة تعيين كلمة المرور!",
             "redirecting": "جاري تحويلك إلى صفحة تسجيل الدخول..."
         }
+    },
+    "not_found": {
+        "title": "الصفحة غير موجودة",
+        "message": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+        "back_home": "العودة إلى الرئيسية"
+    },
+    "language": {
+        "change": "تغيير اللغة",
+        "label": "اللغة"
+    },
+    "units": {
+        "hours_short": "س",
+        "minutes_short": "د"
+    },
+    "time": {
+        "am": "ص",
+        "pm": "م"
+    },
+    "export": {
+        "format": "الصيغة",
+        "from": "من",
+        "to": "إلى",
+        "download_started": "سيبدأ التنزيل قريباً",
+        "button": "تصدير",
+        "this_day": "تصدير هذا اليوم",
+        "channel_data": "تصدير بيانات القناة",
+        "time_entries": "تصدير النشاطات",
+        "pdf_button": "تصدير PDF",
+        "exporting": "جارٍ التصدير..."
+    },
+    "notifications": {
+        "title": "الإشعارات",
+        "empty_title": "لا توجد إشعارات بعد",
+        "empty_hint": "لا شيء جديد حالياً.",
+        "mark_read": "تحديد كمقروء",
+        "delete": "حذف",
+        "messages": {
+            "channel_invitations": "دعاك للانضمام إلى {channel}",
+            "accepted_invitations": "قبل دعوتك إلى {channel}",
+            "new_shared_days": "شارك يوماً جديداً في {channel}",
+            "new_comments": "علّق على يومك المشترك: {excerpt}",
+            "comment_deleted_by_owner": "حذف تعليقك «{excerpt}» بتاريخ {date} في {channel}",
+            "channel_export_ready": "ملف التصدير الخاص بـ {channel} جاهز."
+        },
+        "mark_all_read": "تحديد الكل كمقروء",
+        "see_all": "عرض كل الإشعارات"
+    },
+    "errors": {
+        "forbidden": "ليس لديك صلاحية لتنفيذ هذا الإجراء.",
+        "not_found": "لم يتم العثور على العنصر المطلوب.",
+        "server": "حدث خطأ غير متوقع في الخادم. يرجى المحاولة لاحقاً.",
+        "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+        "network": "خطأ في الشبكة، تعذّر الوصول إلى الخادم. يرجى التحقق من اتصالك."
+    },
+    "pagination": {
+        "label": "التنقل بين الصفحات",
+        "previous": "السابق",
+        "next": "التالي",
+        "page_of": "صفحة {current} من {last}"
+    },
+    "login": {
+        "welcome_back": "أهلا بعودتك",
+        "email": "الايميل",
+        "password": "كلمة المرور",
+        "login": "تسجيل الدخول",
+        "dont_have_account": "لا تملك حساب ؟",
+        "sign_up_here": "أنشئ حساب هنا",
+        "forgot_password": "هل نسيت كلمة السر؟",
+        "hero_title": "نظّم وقتك بهدف.",
+        "hero_text": "رحلتك المشتركة تستمر هنا.",
+        "or_continue_with": "أو تابع باستخدام",
+        "google_sign_in": "تسجيل الدخول عبر Google",
+        "tagline": "هل أنت مستعد لتسجيل تقدمك؟"
+    },
+    "register": {
+        "create_account": "أنشئ حساب",
+        "name": "الاسم",
+        "email": "الايميل",
+        "password": "كلمة المرور",
+        "confirm_password": "تأكيد كلمة المرور",
+        "sign_up": "أنشئ حساب",
+        "you_already_have_account": "لديك حساب؟",
+        "login": "سجل الدخول",
+        "name_placeholder": "اسمك",
+        "hero_title": "ابدأ شيئاً جميلاً.",
+        "hero_text": "انضم إلى مجتمع يركّز على الوضوح والنمو.",
+        "tagline": "ابدأ رحلتك معنا اليوم."
+    },
+    "landing": {
+        "nav_how": "كيف يعمل",
+        "sign_in": "تسجيل الدخول",
+        "get_started": "ابدأ الآن",
+        "hero_title": "اعرف أين ذهبت كل ساعة، من دون فوضى الجداول.",
+        "hero_text": "سجّل يومك في ثوانٍ، وشارك الأيام المنتهية مع قنوات فريقك، وصدّر تقارير CSV أو Excel أو PDF مرتبة بالعربية والإنجليزية.",
+        "hero_cta": "ابدأ التسجيل مجانًا",
+        "hero_signin": "سجّل الدخول إلى مساحتك",
+        "steps_title": "من سجل الصباح إلى تقرير الأسبوع",
+        "steps_text": "ثلاث خطوات بسيطة لأيام مركّزة وتحديثات واضحة للفريق.",
+        "step1_title": "1. سجّل يومك",
+        "step1_text": "أدخل وقتي البداية والنهاية مع تسمية. تُحسب المدة والإجمالي اليومي تلقائيًا.",
+        "step2_title": "2. شارك في القنوات",
+        "step2_text": "ادعُ زملاءك، وشارك يومًا منتهيًا، وناقشه في التعليقات.",
+        "step3_title": "3. راجع وصدّر",
+        "step3_text": "اطّلع على الرسوم البيانية لأي فترة وصدّر ملفات CSV أو Excel أو PDF.",
+        "cta_title": "جاهز لسجلات عمل أنظف؟",
+        "cta_text": "أنشئ حسابك في أقل من دقيقة. يشمل العربية (من اليمين لليسار) والإنجليزية.",
+        "cta_button": "أنشئ حسابًا مجانيًا",
+        "footer_languages": "العربية والإنجليزية"
+    },
+    "channels_page": {
+        "pending_invitation": "دعوة معلّقة",
+        "invited_you": "دعاك {name} إلى {channel}",
+        "owned_and_joined": "قنواتي والمنضم إليها",
+        "role_owner": "المالك",
+        "role_member": "عضو",
+        "members_count": "لا يوجد أعضاء | عضو واحد | عضوان | {n} أعضاء | {n} عضوًا | {n} عضو",
+        "select_channel": "اختر قناة لعرض أيامها المشتركة وأعضائها.",
+        "count_badge": "لا توجد قنوات | قناة واحدة | قناتان | {n} قنوات | {n} قناة | {n} قناة"
     }
 }

@@ -62,6 +62,8 @@ class ExportController extends Controller
 
 
     public function sharedDay(SharedDayExportRequest $request, SharedDay $sharedDay){
+        $this->authorize('view', $sharedDay->channel);
+
         $sharedDay->load(['entries.timeEntry', 'comments.author']);
         $file_extension = $request->validated()['file_extension'];
         return match($file_extension) {

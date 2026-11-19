@@ -40,6 +40,8 @@ class NewCommentNotification extends Notification implements ShouldQueue
             'message'    => $this->comment->author->name . ' commented on your shared day: ' . Str::limit($this->comment->body, 50),
             'type'       => NotificationType::NewComments->value,
             'channel_id' => $this->comment->sharedDay->channel->id,
+            'channel_name' => $this->comment->sharedDay->channel->name,
+            'excerpt'    => Str::limit($this->comment->body, 50),
             'shared_day_id' => $this->comment->sharedDay->id
         ];
     }

@@ -12,7 +12,7 @@ class CommentResource extends JsonResource
         return [
             'id'         => $this->id,
             'body'       => $this->body,
-            'created_at' => $this->created_at->format('M d, Y h:i A'),
+            'created_at' => $this->created_at->toISOString(), // formatted per language by the client
             "shared_day_id" => $this->shared_day_id,
             'author'     => new UserResource($this->whenLoaded('author')),
             'can_edit'   => auth()->id() === $this->user_id,

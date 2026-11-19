@@ -1,1 +1,19 @@
 node_modules/
+.idea/
+.vscode/
+.vite/
+.claude/worktrees/
+
+.env
+.env.*
+!.env.example
+!.env.docker.example
+!.env.production.example
+
+# Editor / tool folders
+.idea/
+.vite/
+.claude/worktrees/
+
+# Local debugging script
+frontend/slow-load.mjs

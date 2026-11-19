@@ -11,18 +11,17 @@ const { items: invitations, paginatorData, loading, error, goToPage, refresh } =
     { immediate: true }
 )
 
+import PageShell from '@/components/PageShell.vue'
 </script>
 
 <template>
-    <div class="max-w-2xl mx-auto px-6 py-8">
+    <PageShell :title="t('invitations_view.title')" narrow>
 
-        <h1 class="text-2xl font-bold text-gray-800 mb-6">{{ t('invitations_view.title') }}</h1>
-
-        <div v-if="error" class="p-4 bg-red-50 text-red-600 rounded-lg border border-red-200">
+        <div v-if="error" class="p-4 bg-[#FEE2E2] text-[#991B1B] rounded-3xl border border-[#FECACA] text-sm font-medium">
             {{ t('invitations_view.error') }}
         </div>
 
-        <div v-else-if="invitations">
+        <div v-else-if="invitations" class="space-y-4">
             <div v-if="invitations.length > 0" class="space-y-3">
                 <InvitationCard
                     v-for="invitation in invitations"
@@ -33,18 +32,19 @@ const { items: invitations, paginatorData, loading, error, goToPage, refresh } =
                     @declined="refresh" />
             </div>
 
-            <AppPagination 
-                v-if="paginatorData?.meta" 
-                :data="paginatorData" 
-                @page-change="goToPage" />
-            <div v-else class="text-center py-16 text-gray-400">
+            <div v-else class="py-16 bg-white border border-dashed border-[#D9D4CE] rounded-3xl text-center text-sm text-[#5F7480] px-6">
                 {{ t('invitations_view.empty') }}
             </div>
+
+            <AppPagination
+                v-if="invitations.length > 0 && paginatorData?.meta"
+                :data="paginatorData"
+                @page-change="goToPage" />
         </div>
 
-        <div v-else class="text-center py-16 text-gray-400">
+        <div v-else class="text-center py-16 text-[#5F7480]">
             {{ t('invitations_view.loading') }}
         </div>
 
-    </div>
+    </PageShell>
 </template>

@@ -1,13 +1,18 @@
 <script setup>
 import { ref, inject } from 'vue'
+import { useI18n } from 'vue-i18n'
 import useApi from '@/composables/useApi'
 import timeEntryService from '@/services/timeEntryService'
+import { useLocaleFormat } from '@/composables/useLocaleFormat'
 
 const props = defineProps(['entry'])
+const { displayTime } = useLocaleFormat()
+const { t } = useI18n()
 const refreshEntries = inject('refreshEntries')
 
 const formatTime = (timeStr) => {
-    const [time, period] = timeStr.split(' ')
+    const [time, rawPeriod] = timeStr.split(' ')
+    const period = rawPeriod.toUpperCase()
     let [hours, minutes] = time.split(':').map(Number)
 
     if (period === 'PM' && hours !== 12) hours += 12
@@ -29,7 +34,11 @@ const { loading, error, request } = useApi(
   () => timeEntryService.deleteTimeEntry(props.entry.id)
 )
 const { loading: updatingLoading, error: updatingError, request: updatingRequest } = useApi(
-  () => timeEntryService.updateTimeEntry(formData.value, props.entry.id)
+  () => timeEntryService.updateTimeEntry({
+    label: formData.value.label,
+    start_time: formData.value.startTime,
+    end_time: formData.value.endTime,
+  }, props.entry.id)
 )
 
 const remove = async () => {
@@ -44,86 +53,75 @@ const update = async () => {
         editing.value = false
     }
 }
+
+const duration = () => {
+    const { hours, minutes } = props.entry.time_taken
+    return `${hours}${t('units.hours_short')} ${String(minutes).padStart(2, '0')}${t('units.minutes_short')}`
+}
+
+const field = 'w-full rounded-xl border border-[#C0D5D6] bg-white px-3 py-2.5 text-sm text-[#083A4F] focus:outline-none focus:border-[#083A4F] focus:ring-2 focus:ring-[#083A4F]/15'
+const iconBtn = 'inline-flex items-center justify-center w-9 h-9 rounded-lg text-[#3E5660] transition-colors hover:bg-[#EFECE8] hover:text-[#083A4F]'
 </script>
 
 <template>
-  <div class="p-6 bg-white rounded-[2rem] mb-4 transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] group relative">
-    
-    <div v-if="!editing" class="flex items-center justify-between w-full">
-      <div class="flex flex-col gap-1 flex-1">
-        <span class="font-bold text-[#333] text-lg tracking-tight">{{ entry.label }}</span>
-        <span class="text-[#A0A0A0] text-sm font-medium">{{ entry.start_time }} — {{ entry.end_time }}</span>
+  <article class="px-4 md:px-5 py-3.5 hover:bg-[#FAF9F7] transition-colors">
+
+    <!-- Row -->
+    <div v-if="!editing" class="grid grid-cols-[1fr_auto] md:grid-cols-[1fr_170px_120px_96px] gap-x-4 gap-y-2 items-center">
+      <h3 class="col-span-2 md:col-span-1 font-medium truncate">{{ entry.label }}</h3>
+
+      <div class="flex items-center gap-3 md:contents">
+        <span class="text-xs text-[#3E5660] tabular-nums" dir="ltr">{{ displayTime(entry.start_time) }} – {{ displayTime(entry.end_time) }}</span>
+        <span class="justify-self-start inline-flex px-2.5 py-1 rounded-full bg-[#C0D5D6] text-[#083A4F] text-xs font-semibold tabular-nums whitespace-nowrap">{{ duration() }}</span>
       </div>
 
-      <div class="flex items-center gap-4">
-        <span class="text-[#5A7D5A] font-bold text-xs py-2 px-4 bg-[#E8F0E8] rounded-xl whitespace-nowrap">
-          {{ $t('single_entry.hour', entry.time_taken.hours) }} 
-          <span class="opacity-40 mx-1">/</span>
-          {{ $t('single_entry.minute', entry.time_taken.minutes) }}
-        </span>
+      <div class="flex items-center justify-end gap-1">
+        <template v-if="!confirmDelete">
+          <button type="button" @click="editing = true" :aria-label="t('single_entry.edit')" :title="t('single_entry.edit')" :class="iconBtn">
+            <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+          </button>
+          <button type="button" @click="confirmDelete = true" :aria-label="t('single_entry.delete')" :title="t('single_entry.delete')" :class="[iconBtn, 'hover:!bg-[#FEE2E2] hover:!text-[#991B1B]']">
+            <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" /></svg>
+          </button>
+        </template>
 
-        <button 
-          @click="editing = true"
-          class="p-2 text-[#BCBCBC] hover:text-[#5A7D5A] transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-          </svg>
-        </button>
+        <div v-else class="flex items-center gap-2 whitespace-nowrap">
+          <span class="text-xs font-semibold text-[#991B1B]">{{ t('single_entry.confirm_delete') }}</span>
+          <button type="button" @click="remove" :disabled="loading" class="px-3 py-1.5 rounded-lg bg-[#991B1B] text-white text-xs font-semibold hover:bg-[#7F1D1D]">
+            {{ loading ? '...' : t('single_entry.yes') }}
+          </button>
+          <button type="button" @click="confirmDelete = false" :disabled="loading" class="px-3 py-1.5 rounded-lg bg-[#EFECE8] text-[#3E5660] text-xs font-semibold">
+            {{ t('single_entry.no') }}
+          </button>
+        </div>
       </div>
     </div>
 
-    <div v-else class="w-full">
-      <form @submit.prevent="update" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-bold text-[#A0A0A0] uppercase tracking-wider">{{ $t("update.label") }}</label>
-            <input type="text" v-model="formData.label" required class="w-full px-4 py-3 bg-[#F9F7F2] border-none rounded-xl focus:ring-2 focus:ring-[#D4E2D4] outline-none transition-all">
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-bold text-[#A0A0A0] uppercase tracking-wider">{{ $t("update.start_time") }}</label>
-            <input type="time" v-model="formData.startTime" required class="w-full px-4 py-3 bg-[#F9F7F2] border-none rounded-xl focus:ring-2 focus:ring-[#D4E2D4] outline-none transition-all">
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-bold text-[#A0A0A0] uppercase tracking-wider">{{ $t("update.end_time") }}</label>
-            <input type="time" v-model="formData.endTime" required class="w-full px-4 py-3 bg-[#F9F7F2] border-none rounded-xl focus:ring-2 focus:ring-[#D4E2D4] outline-none transition-all">
-          </div>
-        </div>
+    <!-- Edit form -->
+    <form v-else @submit.prevent="update" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <label class="flex flex-col gap-1.5">
+          <span class="text-xs font-medium">{{ t('update.label') }}</span>
+          <input type="text" v-model="formData.label" required :class="field">
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="text-xs font-medium">{{ t('update.start_time') }}</span>
+          <input type="time" v-model="formData.startTime" required :class="field">
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="text-xs font-medium">{{ t('update.end_time') }}</span>
+          <input type="time" v-model="formData.endTime" required :class="field">
+        </label>
+      </div>
 
-        <div class="flex gap-3 pt-2">
-          <button type="submit" :disabled="updatingLoading" class="flex-1 py-3 bg-[#5A7D5A] text-white rounded-xl font-bold text-sm shadow-sm hover:bg-[#4a6b4a] transition-all">
-            {{ updatingLoading ? $t("update.loading") : $t("update.update") || $t("update.save_changes") }}
-          </button>
-          <button type="button" @click="editing = false" class="px-6 py-3 bg-[#F0F4F8] text-[#8E9AAF] rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-
-    <div class="absolute -top-2 -right-2 flex gap-2">
-      <template v-if="!confirmDelete">
-        <button
-          @click="confirmDelete = true"
-          class="opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 bg-white shadow-md rounded-full text-[#BCBCBC] hover:text-[#AF4E4E]"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
-          </svg>
+      <div class="flex gap-3">
+        <button type="submit" :disabled="updatingLoading" class="flex-1 py-2.5 rounded-full bg-[#083A4F] text-white text-sm font-medium hover:bg-[#407E8C] transition-colors disabled:opacity-60">
+          {{ updatingLoading ? t('update.loading') : t('update.update') }}
         </button>
-      </template>
-
-      <template v-else>
-        <div class="flex items-center gap-2 bg-white p-2 rounded-2xl shadow-xl border border-[#FFDADA] animate-in fade-in zoom-in duration-200">
-          <span class="text-[0.7rem] font-bold px-2 text-[#AF4E4E]">{{ $t('single_entry.confirm_delete') }}</span>
-          <button @click="remove" :disabled="loading" class="px-3 py-1.5 bg-[#AF4E4E] text-white text-[0.7rem] font-bold rounded-lg hover:bg-[#903d3d]">
-            {{ loading ? '...' : $t('single_entry.yes') }}
-          </button>
-          <button @click="confirmDelete = false" :disabled="loading" class="px-3 py-1.5 bg-[#F0F4F8] text-[#8E9AAF] text-[0.7rem] font-bold rounded-lg">
-            {{ $t('single_entry.no') }}
-          </button>
-        </div>
-      </template>
-    </div>
-
-  </div>
+        <button type="button" @click="editing = false" class="px-6 py-2.5 rounded-full bg-[#EFECE8] text-[#3E5660] text-sm font-medium hover:bg-[#E5E1DD] transition-colors">
+          {{ t('update.cancel') }}
+        </button>
+      </div>
+    </form>
+  </article>
 </template>

@@ -3,79 +3,63 @@ import { useNotificationStore } from '@/stores/notificationStore'
 import NotificationItem from '@/components/notifications/NotificationItem.vue'
 
 const notificationStore = useNotificationStore()
+import PageShell from '@/components/PageShell.vue'
 </script>
 
 <template>
-    <div class="max-w-2xl mx-auto py-8 px-4 space-y-4">
-
-        <!-- Header -->
-        <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-[#2D3436]">Notifications</h1>
+    <PageShell :title="$t('notifications.title')" narrow>
+        <template #actions>
             <button
                 v-if="notificationStore.notifications.length"
                 @click="notificationStore.markAllAsRead"
-                class="text-sm font-medium text-[#5A7D5A] hover:text-[#466446] transition-colors"
-            >
-                Mark all as read
+                class="px-4 py-2 rounded-full text-sm font-medium text-[#3E5660] hover:bg-[#EFECE8] hover:text-[#083A4F] transition-colors">
+                {{ $t('notifications.mark_all_read') }}
             </button>
-        </div>
+        </template>
 
         <!-- Loading -->
         <div v-if="notificationStore.loading" class="space-y-3">
-            <div
-                v-for="i in 5" :key="i"
-                class="h-16 bg-[#F9F7F2] rounded-2xl animate-pulse"
-            />
+            <div v-for="i in 5" :key="i" class="h-16 bg-[#EFECE8] rounded-2xl animate-pulse" />
         </div>
 
-        <!-- Notifications List -->
+        <!-- Notifications list -->
         <div
             v-else-if="notificationStore.notifications.length"
-            class="bg-white rounded-3xl border border-[#F0ECE4] overflow-hidden divide-y divide-[#F5F1E8]"
-        >
+            class="bg-white rounded-3xl border border-[#D9D4CE] overflow-hidden divide-y divide-[#D9D4CE]">
             <NotificationItem
                 v-for="notification in notificationStore.notifications"
                 :key="notification.id"
-                :notification="notification"
-            />
+                :notification="notification" />
         </div>
 
-        <!-- Empty State -->
-        <div
-            v-else
-            class="flex flex-col items-center justify-center py-24 text-center"
-        >
-            <div class="text-5xl mb-4">🔔</div>
-            <p class="text-base font-semibold text-[#2D3436]">No notifications yet</p>
-            <p class="text-sm text-[#8E9AAF] mt-1">You're all caught up.</p>
+        <!-- Empty -->
+        <div v-else class="flex flex-col items-center justify-center py-16 bg-white border border-dashed border-[#D9D4CE] rounded-3xl text-center px-6">
+            <p class="font-semibold">{{ $t('notifications.empty_title') }}</p>
+            <p class="text-sm text-[#5F7480] mt-1">{{ $t('notifications.empty_hint') }}</p>
         </div>
 
         <!-- Pagination -->
-        <div
-            v-if="notificationStore.paginatorData"
-            class="flex items-center justify-center gap-2 pt-4"
-        >
+        <div v-if="notificationStore.paginatorData" class="flex items-center justify-center gap-2">
             <button
-                :disabled="!notificationStore.paginatorData.meta?.links?.find(l => l.label.includes('Previous'))?.url"
+                :disabled="notificationStore.paginatorData.meta?.current_page <= 1"
                 @click="notificationStore.goToPage(notificationStore.paginatorData.meta.current_page - 1)"
-                class="px-4 py-2 rounded-xl text-sm font-medium text-[#8E9AAF] hover:bg-[#F0F4F8] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-            >
-                Previous
+                class="px-4 py-2 rounded-full text-sm font-medium text-[#3E5660] hover:bg-[#EFECE8] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                {{ $t('pagination.previous') }}
             </button>
 
-            <span class="text-sm text-[#8E9AAF]">
-                Page {{ notificationStore.paginatorData.meta?.current_page }}
-                of {{ notificationStore.paginatorData.meta?.last_page }}
+            <span class="text-sm text-[#5F7480]">
+                {{ $t('pagination.page_of', {
+                    current: notificationStore.paginatorData.meta?.current_page,
+                    last: notificationStore.paginatorData.meta?.last_page,
+                }) }}
             </span>
 
             <button
-                :disabled="!notificationStore.paginatorData.meta?.links?.find(l => l.label.includes('Next'))?.url"
+                :disabled="notificationStore.paginatorData.meta?.current_page >= notificationStore.paginatorData.meta?.last_page"
                 @click="notificationStore.goToPage(notificationStore.paginatorData.meta.current_page + 1)"
-                class="px-4 py-2 rounded-xl text-sm font-medium text-[#8E9AAF] hover:bg-[#F0F4F8] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-            >
-                Next
+                class="px-4 py-2 rounded-full text-sm font-medium text-[#3E5660] hover:bg-[#EFECE8] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                {{ $t('pagination.next') }}
             </button>
         </div>
-
-    </div>
+    </PageShell>
 </template>

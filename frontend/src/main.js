@@ -9,7 +9,8 @@ import vue3GoogleLogin from 'vue3-google-login'
 import { i18n } from './plugins/i18n'
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
-import apiClient from './services/api'
+import apiClient, { setUnauthorizedHandler } from './services/api'
+import { useAuthStore } from './stores/auth'
 window.Pusher = Pusher;
 window.Echo = new Echo({
     broadcaster: 'reverb',
@@ -34,6 +35,12 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 app.use(Toast)
+
+// An expired or revoked token (any 401 outside the auth forms) ends the session and returns to login.
+setUnauthorizedHandler(() => {
+  useAuthStore().clearSession()
+  router.push({ name: 'Login' })
+})
 app.use(i18n)
 app.use(vue3GoogleLogin, {
   clientId: import.meta.env.VITE_CLIENT_ID
