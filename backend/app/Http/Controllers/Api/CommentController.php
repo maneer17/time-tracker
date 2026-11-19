@@ -50,7 +50,8 @@ class CommentController extends Controller
 
         $comment->load(['author', 'sharedDay.channel']);
 
-        if ($comment->sharedDay->channel->isOwner(auth()->user())) {
+        // Only tell the author when someone else (the owner) removed their comment
+        if ($comment->sharedDay->channel->isOwner(auth()->user()) && $comment->user_id !== auth()->id()) {
             event(new CommentDeletedByOwnerEvent($comment));
         }
 

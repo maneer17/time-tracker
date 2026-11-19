@@ -1,8 +1,12 @@
 <script setup>
+import { onMounted } from 'vue'
 import { useNotificationStore } from '@/stores/notificationStore'
 import NotificationItem from '@/components/notifications/NotificationItem.vue'
 
 const notificationStore = useNotificationStore()
+
+// always open on the newest page, whatever page the shared list was last left on
+onMounted(() => notificationStore.refresh())
 import PageShell from '@/components/PageShell.vue'
 </script>
 

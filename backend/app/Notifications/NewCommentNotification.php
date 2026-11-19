@@ -17,6 +17,7 @@ class NewCommentNotification extends Notification implements ShouldQueue
 {
     use Queueable, ChecksNotificationPreferences;
 
+    public $deleteWhenMissingModels = true;
     public $tries   = 3;
     public $backoff = [30, 60, 120];
 
@@ -47,6 +48,13 @@ class NewCommentNotification extends Notification implements ShouldQueue
     }
 
     public function databaseType(object $notifiable): string
+    {
+        return NotificationType::NewComments->value;
+    }
+
+    // Laravel's broadcast channel would otherwise send the class name as `type`; keep it equal to the stored value
+    // so live and saved notifications look identical to the client.
+    public function broadcastType(): string
     {
         return NotificationType::NewComments->value;
     }

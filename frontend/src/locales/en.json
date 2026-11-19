@@ -385,5 +385,11 @@
         "members_count": "No members | {n} member | {n} members",
         "select_channel": "Select a channel to see its shared days and members.",
         "count_badge": "No channels | {n} channel | {n} channels"
+    },
+    "unsubscribed": {
+        "title": "You're unsubscribed",
+        "message": "You won't get these emails any more. You can change this any time in Settings.",
+        "message_type": "You won't get \"{type}\" emails any more. You can change this any time in Settings.",
+        "back": "Go to Time Tracker"
     }
 }

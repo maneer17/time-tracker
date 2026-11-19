@@ -14,6 +14,9 @@ const unreadCount = computed(() => notificationStore.unreadCount?.count ?? 0)
 
 const toggleDropdown = () => {
     isOpen.value = !isOpen.value
+    // the list is shared with the full Notifications page, which may be on a later page:
+    // reopening the bell always starts again from the newest
+    if (isOpen.value) notificationStore.refresh()
 }
 
 // close when clicking outside

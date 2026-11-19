@@ -4,15 +4,17 @@ namespace App\Notifications;
 
 use App\Models\Channel;
 use App\Enums\NotificationType;
+use App\Traits\ChecksNotificationPreferences;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\URL;
 
 class ChannelExportReadyNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ChecksNotificationPreferences;
 
     public function __construct(
         private Channel $channel,
@@ -21,7 +23,25 @@ class ChannelExportReadyNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast'];
+        return $this->viaEmail($notifiable, NotificationType::ChannelExportReady)
+            ? ['database', 'broadcast', 'mail']
+            : ['database', 'broadcast'];
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $unsubscribeUrl = URL::signedRoute('email.unsubscribe', [
+            'user' => $notifiable->id,
+            'type' => NotificationType::ChannelExportReady->value,
+        ]);
+
+        return (new MailMessage)
+            ->subject('Your channel export is ready')
+            ->greeting('Hello ' . $notifiable->name . '!')
+            ->line('Your export for ' . $this->channel->name . ' is ready. The download link works for 24 hours.')
+            ->action('Download export', $this->downloadUrl())
+            ->line('[Unsubscribe from these emails](' . $unsubscribeUrl . ')')
+            ->salutation('Regards, ' . config('app.name'));
     }
 
     private function downloadUrl(): string
@@ -48,6 +68,13 @@ class ChannelExportReadyNotification extends Notification implements ShouldQueue
     }
 
     public function databaseType(object $notifiable): string
+    {
+        return NotificationType::ChannelExportReady->value;
+    }
+
+    // Laravel's broadcast channel would otherwise send the class name as `type`; keep it equal to the stored value
+    // so live and saved notifications look identical to the client.
+    public function broadcastType(): string
     {
         return NotificationType::ChannelExportReady->value;
     }

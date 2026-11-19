@@ -27,7 +27,7 @@ class AcceptedInvitationNotification extends Notification implements ShouldQueue
     public function via(object $notifiable): array
     {
         return $this->viaEmail($notifiable, NotificationType::AcceptedInvitations)
-            ? ['database', 'broadcast']
+            ? ['database', 'broadcast', 'mail']
             : ['database', 'broadcast'];
     }
 
@@ -44,6 +44,13 @@ class AcceptedInvitationNotification extends Notification implements ShouldQueue
     }
 
     public function databaseType(object $notifiable): string
+    {
+        return NotificationType::AcceptedInvitations->value;
+    }
+
+    // Laravel's broadcast channel would otherwise send the class name as `type`; keep it equal to the stored value
+    // so live and saved notifications look identical to the client.
+    public function broadcastType(): string
     {
         return NotificationType::AcceptedInvitations->value;
     }
