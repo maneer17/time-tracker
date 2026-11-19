@@ -7,6 +7,8 @@ use App\Traits\ChecksNotificationPreferences;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Notifications\Notification;
 use App\Enums\NotificationType;
 use Illuminate\Support\Str;
@@ -41,7 +43,25 @@ class CommentDeletedByOwnerNotification extends Notification implements ShouldQu
 
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast'];
+        return $this->viaEmail($notifiable, NotificationType::CommentDeletedByOwner)
+            ? ['database', 'broadcast', 'mail']
+            : ['database', 'broadcast'];
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $unsubscribeUrl = URL::signedRoute('email.unsubscribe', [
+            'user' => $notifiable->id,
+            'type' => NotificationType::CommentDeletedByOwner->value,
+        ]);
+
+        return (new MailMessage)
+            ->subject('Your comment was removed')
+            ->greeting('Hello ' . $notifiable->name . '!')
+            ->line('Your comment "' . Str::limit($this->commentBody, 100) . '" on the shared day ' . $this->sharedDayDate . ' in ' . $this->channelName . ' was removed by the channel owner.')
+            ->action('View Channel', config('app.frontend_url') . '/channels/' . $this->channelId)
+            ->line('[Unsubscribe from these emails](' . $unsubscribeUrl . ')')
+            ->salutation('Regards, ' . config('app.name'));
     }
 
     public function toArray(object $notifiable): array
@@ -66,10 +86,22 @@ class CommentDeletedByOwnerNotification extends Notification implements ShouldQu
         return NotificationType::CommentDeletedByOwner->value;
     }
 
+    // Laravel's broadcast channel would otherwise send the class name as `type`; keep it equal to the stored value
+    // so live and saved notifications look identical to the client.
+    public function broadcastType(): string
+    {
+        return NotificationType::CommentDeletedByOwner->value;
+    }
+
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
-        // reuse toArray — single source of truth, no duplication
-        return new BroadcastMessage($this->toArray($notifiable));
+        return new BroadcastMessage([
+            'id'         => $this->id,
+            'type'       => $this->databaseType($notifiable),
+            'data'       => $this->toArray($notifiable),
+            'read_at'    => null,
+            'created_at' => now()->toISOString(),
+        ]);
     }
 
     public function failed(\Throwable $exception): void

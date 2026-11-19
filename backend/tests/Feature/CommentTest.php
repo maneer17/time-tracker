@@ -44,6 +44,27 @@ class CommentTest extends TestCase
         return "/api/shared-days/{$this->sharedDay->id}/comments".($comment ? "/{$comment->id}" : '');
     }
 
+    public function test_the_owner_commenting_on_their_own_day_is_not_notified(): void
+    {
+        Notification::fake();
+        Sanctum::actingAs($this->owner);
+
+        $this->postJson($this->url(), ['body' => 'Note to self'])->assertCreated();
+
+        Notification::assertNothingSent();
+    }
+
+    public function test_the_owner_removing_their_own_comment_does_not_notify_them(): void
+    {
+        Notification::fake();
+        $comment = $this->comment($this->owner);
+        Sanctum::actingAs($this->owner);
+
+        $this->deleteJson($this->url($comment))->assertOk();
+
+        Notification::assertNothingSent();
+    }
+
     public function test_a_member_can_comment_and_the_channel_owner_is_notified(): void
     {
         Notification::fake();

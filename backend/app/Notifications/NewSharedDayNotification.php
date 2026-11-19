@@ -17,6 +17,7 @@ class NewSharedDayNotification extends Notification implements ShouldQueue
 {
     use Queueable, ChecksNotificationPreferences;
 
+    public $deleteWhenMissingModels = true;
     public $tries   = 3;
     public $backoff = [30, 60, 120];
 
@@ -45,6 +46,13 @@ class NewSharedDayNotification extends Notification implements ShouldQueue
     }
 
     public function databaseType(object $notifiable): string
+    {
+        return NotificationType::NewSharedDays->value;
+    }
+
+    // Laravel's broadcast channel would otherwise send the class name as `type`; keep it equal to the stored value
+    // so live and saved notifications look identical to the client.
+    public function broadcastType(): string
     {
         return NotificationType::NewSharedDays->value;
     }

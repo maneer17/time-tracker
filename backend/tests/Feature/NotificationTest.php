@@ -13,6 +13,7 @@ use App\Notifications\NewInvitation;
 use App\Notifications\NewSharedDayNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
@@ -138,6 +139,52 @@ class NotificationTest extends TestCase
             foreach ($expected as $key => $value) {
                 $this->assertSame($value, $payload[$key], "$label: $key");
             }
+        }
+    }
+
+    /** One of each notification type, paired with the user it is sent to. */
+    private function everyNotificationType(): array
+    {
+        $owner = User::factory()->create();
+        $guest = User::factory()->create();
+        $channel = $this->channelOwnedBy($owner);
+        $sharedDay = $this->shareDay($channel, $owner);
+        $comment = Comment::create(['shared_day_id' => $sharedDay->id, 'user_id' => $guest->id, 'body' => 'Looks great']);
+        $comment->load(['author', 'sharedDay.channel']);
+        $invitation = $this->pendingInvitation($channel, $guest);
+
+        return [
+            NotificationType::ChannelInvitations->value    => [new NewInvitation($invitation), $guest],
+            NotificationType::AcceptedInvitations->value   => [new AcceptedInvitationNotification($invitation), $owner],
+            NotificationType::NewSharedDays->value         => [new NewSharedDayNotification($sharedDay), $guest],
+            NotificationType::NewComments->value           => [new NewCommentNotification($comment), $owner],
+            NotificationType::CommentDeletedByOwner->value => [new CommentDeletedByOwnerNotification($comment), $guest],
+            NotificationType::ChannelExportReady->value    => [new ChannelExportReadyNotification($channel, 'file.xlsx'), $owner],
+        ];
+    }
+
+    public function test_every_notification_type_sends_email_when_the_user_wants_it(): void
+    {
+        foreach ($this->everyNotificationType() as $type => [$notification, $user]) {
+            $this->assertContains('mail', $notification->via($user), "$type is emailed when the setting is on");
+
+            $user->notificationTypes()->where('notification_type', $type)->update(['mail' => false]);
+            $this->assertNotContains('mail', $notification->via($user), "$type is not emailed when the setting is off");
+        }
+    }
+
+    public function test_live_notifications_have_the_same_type_and_shape_as_saved_ones(): void
+    {
+        foreach ($this->everyNotificationType() as $type => [$notification, $user]) {
+            $notification->id = (string) Str::uuid();
+
+            $live = (new BroadcastNotificationCreated($user, $notification, $notification->toBroadcast($user)->data))->broadcastWith();
+
+            $this->assertSame($type, $live['type'], "$type: the live type matches the stored one, not the class name");
+            $this->assertSame($type, $notification->databaseType($user));
+            $this->assertSame($notification->id, $live['id']);
+            $this->assertArrayHasKey('data', $live, "$type: the live payload carries its data");
+            $this->assertSame($notification->toArray($user), $live['data']);
         }
     }
 

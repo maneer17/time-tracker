@@ -1,6 +1,7 @@
 import About from '@/views/About.vue'
 import NotFound from '@/views/NotFound.vue'
 import LandingView from '@/views/LandingView.vue'
+import Unsubscribed from '@/views/Unsubscribed.vue'
 import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '@/views/Login.vue'
@@ -34,6 +35,12 @@ const router = createRouter({
       path: "/welcome",
       name: "Landing",
       component: LandingView,
+      meta: { fullWidth: true }
+    },
+    {
+      path: "/unsubscribed",
+      name: "Unsubscribed",
+      component: Unsubscribed,
       meta: { fullWidth: true }
     },
     {

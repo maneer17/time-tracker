@@ -11,7 +11,12 @@ class NewCommentListener
     {
         $comment = $event->comment;
         $owner = $comment->sharedDay->channel->owner;
+
+        // The owner commenting on their own day doesn't need to be told about it
+        if ($owner->id === $comment->user_id) {
+            return;
+        }
+
         $owner->notify(new NewCommentNotification($comment));
-        
     }
 }

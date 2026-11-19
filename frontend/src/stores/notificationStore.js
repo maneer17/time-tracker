@@ -7,8 +7,10 @@ import { useAuthStore } from '@/stores/auth'
 
 export const useNotificationStore = defineStore('notifications', () => {
 
+    // Loaded by the auth watcher below, once we know whose notifications to fetch
     const { items: notifications, paginatorData, loading, error, goToPage, refresh } = usePagination(
-        (page) => notificationService.getNotifications(page)
+        (page) => notificationService.getNotifications(page),
+        { immediate: false }
     )
 
     // unread count
@@ -50,9 +52,14 @@ export const useNotificationStore = defineStore('notifications', () => {
         (userId, oldUserId) => {
             if (oldUserId !== userId) {
                 unsubscribe(oldUserId)   // leave old channel (logout or user switch)
+                // drop the previous account's list and count straight away,
+                // otherwise the next person to sign in would briefly see them
+                paginatorData.value = null
+                unreadCount.value = null
             }
             if (userId) {
-                fetchUnreadCount()       // refresh count for the new user
+                refresh()                // this account's notifications
+                fetchUnreadCount()       // and its unread count
                 subscribe(userId)
             }
         },
